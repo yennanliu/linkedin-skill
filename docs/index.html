@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Automate your LinkedIn job applications with Claude Code AI - Easy Apply automation">
+    <title>LinkedIn Job Auto-Apply | Claude Code Skill</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="34" height="34" rx="4" fill="#0A66C2"/>
+                        <path d="M10 13H14V24H10V13ZM12 8C13.1 8 14 8.9 14 10C14 11.1 13.1 12 12 12C10.9 12 10 11.1 10 10C10 8.9 10.9 8 12 8Z" fill="white"/>
+                        <path d="M16 13H20V15H20.1C20.6 14.1 21.9 13 23.8 13C27.7 13 28 15.5 28 18.4V24H24V19.2C24 17.4 24 15.1 21.5 15.1C19 15.1 18.6 17.1 18.6 19.1V24H14.6V13H16Z" fill="white"/>
+                    </svg>
+                    <span class="logo-text">LinkedIn Auto-Apply</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#features">Features</a>
+                    <a href="#how-it-works">How It Works</a>
+                    <a href="#installation">Get Started</a>
+                    <a href="#docs">Docs</a>
+                    <a href="https://github.com/yennanliu/linkedin-skill" target="_blank" class="btn-github">
+                        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    Claude Code Skill
+                </div>
+                <h1 class="hero-title">
+                    Automate Your Job Search on <span class="linkedin-text">LinkedIn</span>
+                </h1>
+                <p class="hero-subtitle">
+                    AI-powered Easy Apply automation for LinkedIn. Apply to dozens of jobs in minutes
+                    with intelligent filtering, keyboard controls, and safety features.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#installation" class="btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Get Started Free
+                    </a>
+                    <a href="https://github.com/yennanliu/linkedin-skill" target="_blank" class="btn-secondary">
+                        View on GitHub
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                            <polyline points="15 3 21 3 21 9"/>
+                            <line x1="10" y1="14" x2="21" y2="3"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">Easy Apply</div>
+                        <div class="stat-label">Automation Focus</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">Smart</div>
+                        <div class="stat-label">Skip Applied Jobs</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">Safe</div>
+                        <div class="stat-label">Human-Like Delays</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Powerful Features</h2>
+                <p class="section-subtitle">Everything you need for efficient job applications</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Apply to 20-50 Easy Apply jobs automatically. Batch process multiple pages with target-based stopping.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Target-Based Execution</h3>
+                    <p>Set a target number of applications and stop automatically when reached. No wasted time.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⌨️</div>
+                    <h3>Keyboard Controls</h3>
+                    <p>Press P to pause, R to resume, Q to quit. Full control during automation with real-time monitoring.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Safe & Secure</h3>
+                    <p>Built-in delays (2-4 seconds), error handling, and rate limiting. Respects LinkedIn's terms.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>On-Page Status</h3>
+                    <p>Visual progress indicator shows applications count, current page, and automation state.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Smart Filtering</h3>
+                    <p>Automatically skips already-applied jobs and non-Easy Apply positions. Efficient processing.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-subtitle">Simple automation in 3 steps</p>
+            </div>
+
+            <div class="steps">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Install the Skill</h3>
+                        <p>Add the LinkedIn Auto-Apply skill to Claude Code via marketplace</p>
+                        <div class="code-snippet">
+                            <code>/plugin install linkedin-job-auto-apply</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Configure Settings</h3>
+                        <p>Set your target applications, search keywords, and location preferences</p>
+                        <div class="code-snippet">
+                            <code>targetApplications: 20, keywords: "software engineer"</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Start Applying</h3>
+                        <p>Watch as Easy Apply jobs are processed automatically with real-time status</p>
+                        <div class="code-snippet">
+                            <code>✅ 20/20 applications submitted successfully!</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section id="installation" class="installation">
+        <div class="container">
+            <div class="install-grid">
+                <div class="install-info">
+                    <h2>Ready to Get Started?</h2>
+                    <p class="install-description">
+                        Install in under 30 seconds and start automating your LinkedIn job applications today.
+                    </p>
+                    <div class="install-benefits">
+                        <div class="benefit-item">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0A66C2" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>No signup required</span>
+                        </div>
+                        <div class="benefit-item">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0A66C2" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>Free and open source</span>
+                        </div>
+                        <div class="benefit-item">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0A66C2" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>Works with Claude Code</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="install-terminal">
+                    <div class="terminal">
+                        <div class="terminal-header">
+                            <div class="terminal-dots">
+                                <span class="dot red"></span>
+                                <span class="dot yellow"></span>
+                                <span class="dot green"></span>
+                            </div>
+                            <span class="terminal-title">Terminal</span>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">claude</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="prompt">&gt;</span>
+                                <span class="command">/plugin marketplace add yennanliu/linkedin-skill</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="prompt">&gt;</span>
+                                <span class="command">/plugin install linkedin-job-auto-apply</span>
+                            </div>
+                            <div class="terminal-line success">
+                                <span>✅ Installation Complete!</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="prompt">&gt;</span>
+                                <span class="command">/linkedin-job-auto-apply</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Documentation -->
+    <section id="docs" class="docs">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Documentation</h2>
+                <p class="section-subtitle">Comprehensive guides and references</p>
+            </div>
+
+            <div class="docs-grid">
+                <a href="https://github.com/yennanliu/linkedin-skill/blob/main/QUICKSTART.md" class="doc-card" target="_blank">
+                    <div class="doc-icon">🚀</div>
+                    <h3>Quick Start Guide</h3>
+                    <p>Get up and running in 5 minutes with step-by-step instructions</p>
+                    <span class="doc-link">Read Guide →</span>
+                </a>
+
+                <a href="https://github.com/yennanliu/linkedin-skill/blob/main/skills/linkedin-job-auto-apply/SKILL.md" class="doc-card" target="_blank">
+                    <div class="doc-icon">📚</div>
+                    <h3>Full Documentation</h3>
+                    <p>Complete technical reference with all features and options</p>
+                    <span class="doc-link">Read Docs →</span>
+                </a>
+
+                <a href="https://github.com/yennanliu/linkedin-skill/blob/main/USAGE_EXAMPLES.md" class="doc-card" target="_blank">
+                    <div class="doc-icon">💡</div>
+                    <h3>Usage Examples</h3>
+                    <p>21+ real-world scenarios and practical workflows</p>
+                    <span class="doc-link">View Examples →</span>
+                </a>
+
+                <a href="https://github.com/yennanliu/linkedin-skill/blob/main/INSTALLATION.md" class="doc-card" target="_blank">
+                    <div class="doc-icon">⚙️</div>
+                    <h3>Installation Guide</h3>
+                    <p>Detailed setup instructions for all methods</p>
+                    <span class="doc-link">Read Guide →</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Frequently Asked Questions</h2>
+            </div>
+
+            <div class="faq-list">
+                <details class="faq-item">
+                    <summary>Is this safe to use with my LinkedIn account?</summary>
+                    <p>Yes, the automation includes safety features like human-like delays (2-4 seconds), rate limiting, and error handling. However, use responsibly and avoid excessive automation. LinkedIn may flag suspicious activity.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>What is Easy Apply?</summary>
+                    <p>Easy Apply is LinkedIn's one-click application feature. This skill focuses on Easy Apply jobs because they're simple and fast. Complex applications requiring cover letters or assessments are automatically skipped.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>How many jobs should I apply to per session?</summary>
+                    <p>We recommend 20-50 applications per session. Quality matters more than quantity. Take breaks between sessions (several hours) to avoid rate limiting.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>Can I pause or stop the automation?</summary>
+                    <p>Yes! Use keyboard controls: Press P to pause, R to resume, and Q to quit gracefully. The on-page status indicator shows your current progress.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>Will it skip jobs I've already applied to?</summary>
+                    <p>Yes, the automation automatically detects and skips jobs you've already applied to, saving time and avoiding duplicate applications.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>What if I encounter a CAPTCHA?</summary>
+                    <p>If LinkedIn shows a CAPTCHA, you'll need to solve it manually. This usually happens if LinkedIn detects unusual activity. Wait several hours before trying again.</p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Land Your Dream Job?</h2>
+                <p>Join professionals who are getting more interviews by applying smarter, not harder.</p>
+                <div class="cta-buttons">
+                    <a href="https://github.com/yennanliu/linkedin-skill" class="btn-primary-white" target="_blank">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Get Started Free
+                    </a>
+                    <a href="https://github.com/yennanliu/linkedin-skill/blob/main/QUICKSTART.md" class="btn-secondary-white" target="_blank">
+                        Read Documentation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="34" height="34" rx="4" fill="#0A66C2"/>
+                            <path d="M10 13H14V24H10V13ZM12 8C13.1 8 14 8.9 14 10C14 11.1 13.1 12 12 12C10.9 12 10 11.1 10 10C10 8.9 10.9 8 12 8Z" fill="white"/>
+                            <path d="M16 13H20V15H20.1C20.6 14.1 21.9 13 23.8 13C27.7 13 28 15.5 28 18.4V24H24V19.2C24 17.4 24 15.1 21.5 15.1C19 15.1 18.6 17.1 18.6 19.1V24H14.6V13H16Z" fill="white"/>
+                        </svg>
+                        <span>LinkedIn Auto-Apply</span>
+                    </div>
+                    <p class="footer-description">
+                        AI-powered Easy Apply automation for LinkedIn job seekers
+                    </p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Documentation</h4>
+                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/QUICKSTART.md" target="_blank">Quick Start</a>
+                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/INSTALLATION.md" target="_blank">Installation</a>
+                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/USAGE_EXAMPLES.md" target="_blank">Examples</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Resources</h4>
+                        <a href="https://github.com/yennanliu/linkedin-skill" target="_blank">GitHub</a>
+                        <a href="https://github.com/yennanliu/linkedin-skill/issues" target="_blank">Report Issue</a>
+                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/CHANGELOG.md" target="_blank">Changelog</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Community</h4>
+                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/CONTRIBUTING.md" target="_blank">Contributing</a>
+                        <a href="https://github.com/yennanliu/104Skill" target="_blank">104Skill</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 LinkedIn Auto-Apply. Open source under MIT License.</p>
+                <p>Made with ❤️ for job seekers worldwide</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
