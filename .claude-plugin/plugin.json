@@ -1,0 +1,22 @@
+{
+  "name": "linkedin-job-auto-apply",
+  "version": "1.0.0",
+  "description": "Automate job applications on LinkedIn using Playwright MCP tools. Supports Easy Apply jobs, single job applications, batch processing, and multi-page automation with controls.",
+  "author": {
+    "name": "jerryliu",
+    "email": "jerryliu@github.com"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/jerryliu/linkedin-skill.git",
+  "homepage": "https://github.com/jerryliu/linkedin-skill",
+  "keywords": [
+    "job-automation",
+    "linkedin",
+    "easy-apply",
+    "playwright",
+    "job-search",
+    "automation",
+    "claude-code"
+  ],
+  "skills": "./skills"
+}
