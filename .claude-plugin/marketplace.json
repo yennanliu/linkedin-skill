@@ -1,0 +1,23 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "linkedin-job-auto-apply-marketplace",
+  "version": "1.0.0",
+  "description": "Automate job applications on LinkedIn using Playwright MCP tools. Supports Easy Apply jobs, single job applications, batch processing, and multi-page automation.",
+  "owner": {
+    "name": "jerryliu",
+    "email": "jerryliu@github.com"
+  },
+  "plugins": [
+    {
+      "name": "linkedin-job-auto-apply",
+      "description": "Automate job applications on LinkedIn",
+      "version": "1.0.0",
+      "author": {
+        "name": "jerryliu",
+        "email": "jerryliu@github.com"
+      },
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
