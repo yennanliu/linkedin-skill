@@ -17,19 +17,19 @@ info() { msg "$1" "$BLUE"; }
 warn() { msg "⚠  $1" "$YELLOW"; }
 err()  { msg "✗ $1" "$RED"; }
 
-SKILL_DIR="skills/linkedin-job-auto-apply"
 
 install_claude() {
   info "Installing for Claude Code..."
-  DEST="$HOME/.claude/skills/linkedin-job-auto-apply"
-  if [ -d "$DEST" ]; then
-    warn "Already installed at $DEST — overwriting."
-    rm -rf "$DEST"
-  fi
-  mkdir -p "$DEST"
-  cp -r "$SKILL_DIR"/* "$DEST/"
-  [ -f "$DEST/SKILL.md" ] && ok "Claude Code: installed to $DEST" || { err "Claude Code install failed"; return 1; }
-  echo "  Usage: claude → /linkedin-job-auto-apply"
+
+  for skill in linkedin-job-auto-apply linkedin-profile-scraper; do
+    DEST="$HOME/.claude/skills/$skill"
+    [ -d "$DEST" ] && { warn "Overwriting $DEST"; rm -rf "$DEST"; }
+    mkdir -p "$DEST"
+    cp -r "skills/$skill/"* "$DEST/"
+    [ -f "$DEST/SKILL.md" ] && ok "Claude Code: $skill installed" || { err "Install failed: $skill"; return 1; }
+  done
+
+  echo "  Usage: claude → /linkedin-job-auto-apply  or  /linkedin-profile-scraper"
 }
 
 install_gemini() {
@@ -38,11 +38,14 @@ install_gemini() {
   mkdir -p "$DEST"
   cp ".gemini/extensions/linkedin-job-auto-apply/gemini-extension.json" "$DEST/"
   cp ".gemini/extensions/linkedin-job-auto-apply/GEMINI.md" "$DEST/"
-  # Include JS files so Gemini can reference them
-  cp "$SKILL_DIR/autoApplyLinkedInJobs.js" "$DEST/"
-  cp "$SKILL_DIR/applySingleJob.js" "$DEST/"
+  # Job auto-apply JS files
+  cp "skills/linkedin-job-auto-apply/autoApplyLinkedInJobs.js" "$DEST/"
+  cp "skills/linkedin-job-auto-apply/applySingleJob.js" "$DEST/"
+  # Profile scraper JS files
+  cp "skills/linkedin-profile-scraper/scrapeLinkedInProfiles.js" "$DEST/"
+  cp "skills/linkedin-profile-scraper/scrapeSingleProfile.js" "$DEST/"
   [ -f "$DEST/gemini-extension.json" ] && ok "Gemini CLI: installed to $DEST" || { err "Gemini CLI install failed"; return 1; }
-  echo "  Usage: gemini → ask about LinkedIn job automation"
+  echo "  Usage: gemini → ask about LinkedIn job automation or profile scraping"
 }
 
 install_copilot() {

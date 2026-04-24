@@ -4,11 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A multi-platform AI skill that automates LinkedIn job applications via Playwright MCP browser automation. Supports Claude Code (primary), Gemini CLI, and GitHub Copilot.
+Two LinkedIn automation skills using Playwright MCP browser automation. Supports Claude Code (primary), Gemini CLI, and GitHub Copilot.
+
+| Skill | Invoke | Description |
+|-------|--------|-------------|
+| Job Auto-Apply | `/linkedin-job-auto-apply` | Apply to Easy Apply jobs in batch |
+| Profile Scraper | `/linkedin-profile-scraper` | Scrape profiles by company/country/industry |
 
 | Platform | Config file | Install dir |
 |----------|-------------|-------------|
-| Claude Code | `SKILL.md` | `~/.claude/skills/linkedin-job-auto-apply/` |
+| Claude Code | `SKILL.md` | `~/.claude/skills/<skill-name>/` |
 | Gemini CLI | `GEMINI.md` / `.gemini/extensions/…/GEMINI.md` | `~/.gemini/extensions/linkedin-job-auto-apply/` |
 | GitHub Copilot | `.github/copilot-instructions.md` | committed to repo |
 
@@ -32,6 +37,8 @@ JavaScript syntax check (no build step needed):
 ```bash
 node --check skills/linkedin-job-auto-apply/autoApplyLinkedInJobs.js
 node --check skills/linkedin-job-auto-apply/applySingleJob.js
+node --check skills/linkedin-profile-scraper/scrapeLinkedInProfiles.js
+node --check skills/linkedin-profile-scraper/scrapeSingleProfile.js
 ```
 
 Validate JSON config:
@@ -54,21 +61,34 @@ CI runs automatically on push/PR to `main` via `.github/workflows/test.yml`.
   plugin.json         # Plugin manifest (name, version, skills path)
   marketplace.json    # Marketplace listing metadata
 
-skills/linkedin-job-auto-apply/
-  SKILL.md            # Skill prompt loaded by Claude Code when invoked
-  autoApplyLinkedInJobs.js  # Main batch automation (target-based, keyboard controls)
-  applySingleJob.js   # Helper: listJobs() and applySingleJob() for single-job use
+skills/
+  linkedin-job-auto-apply/
+    SKILL.md                   # Skill prompt (entry point)
+    autoApplyLinkedInJobs.js   # Batch automation with keyboard controls
+    applySingleJob.js          # listJobs() + applySingleJob() helpers
+
+  linkedin-profile-scraper/
+    SKILL.md                   # Skill prompt (entry point)
+    scrapeLinkedInProfiles.js  # Batch scraper by company/country/industry
+    scrapeSingleProfile.js     # Scrape one profile by URL
 
 docs/                 # GitHub Pages site (LinkedIn-styled UI)
 ```
 
 ### Key Design Points
 
-**SKILL.md is the entry point** — when a user runs `/linkedin-job-auto-apply`, Claude reads `skills/linkedin-job-auto-apply/SKILL.md` and follows the instructions there. The JS files are not auto-executed; Claude is instructed to copy/paste them into Playwright MCP code blocks.
+**SKILL.md is the entry point** — when a user runs `/linkedin-job-auto-apply` or `/linkedin-profile-scraper`, Claude reads the corresponding `SKILL.md` and follows its instructions. The JS files are not auto-executed; they are pasted into Playwright MCP code blocks.
 
-**Two JS files, two usage modes:**
-- `applySingleJob.js` — exports `listJobs(page)` and `applySingleJob(page, index)` for testing/manual one-at-a-time use
-- `autoApplyLinkedInJobs.js` — exports `autoApplyLinkedInJobs(page, options)` for batch automation with target-based stopping and P/R/Q keyboard controls
+**Profile scraper flow:** search results page → collect profile URLs → visit each profile and scroll to trigger lazy-loaded sections → extract structured data via `page.evaluate()`.
+
+**Scraper selectors** (fragile — update if LinkedIn redesigns):
+- Name: `h1`
+- Location: `.text-body-small.inline.t-black--light.break-words`
+- Experience section anchor: `#experience`
+- Experience items: `li.artdeco-list__item` inside the section
+- Title: `.t-bold span[aria-hidden="true"]`
+- Company: `.t-14.t-normal span[aria-hidden="true"]`
+- Date/location: `.t-14.t-normal.t-black--light span[aria-hidden="true"]`
 
 **No Node.js package.json** — the JS files run in the Playwright MCP browser context (injected via `page.evaluate()`), not as standalone Node modules. The `module.exports` guard at the bottom is for optional use in test environments only.
 

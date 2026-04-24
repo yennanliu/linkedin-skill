@@ -1,46 +1,54 @@
-# LinkedIn Job Auto-Apply
+# LinkedIn Skills
 
-Automate LinkedIn job applications using Playwright browser automation.
+Two LinkedIn automation skills using Playwright browser tools.
 
-## How to Use
+---
 
-When asked to apply to LinkedIn jobs, use the JavaScript functions from this skill.
+## Skill 1: Job Auto-Apply
 
-**Step 1 — Single job test (always start here):**
+Automatically apply to LinkedIn Easy Apply jobs.
+
 ```javascript
-// Paste contents of applySingleJob.js, then:
-await page.goto('https://www.linkedin.com/jobs/search/?keywords=software%20engineer&f_AL=true');
-await page.waitForTimeout(3000);
-const jobs = await listJobs(page);
-console.log(jobs);                         // show available jobs
-const result = await applySingleJob(page, 0);
-console.log(result);                       // { status: 'success'|'skipped'|'failed', job: {...} }
-```
-
-**Step 2 — Batch automation:**
-```javascript
-// Paste contents of autoApplyLinkedInJobs.js, then:
+// Paste autoApplyLinkedInJobs.js, then:
 await autoApplyLinkedInJobs(page, {
-  targetApplications: 20,       // stop after 20 successful apps
+  targetApplications: 20,       // stop after N successful apps
   searchKeywords: 'software engineer',
   location: 'United States',
   easyApplyOnly: true
 });
-// Keyboard controls: P=Pause  R=Resume  Q=Quit
+// Keyboard: P=Pause  R=Resume  Q=Quit
 ```
 
-## Script Files
+Files: `autoApplyLinkedInJobs.js`, `applySingleJob.js`
 
-- `skills/linkedin-job-auto-apply/applySingleJob.js` — `listJobs()` + `applySingleJob()`
-- `skills/linkedin-job-auto-apply/autoApplyLinkedInJobs.js` — batch automation
+---
+
+## Skill 2: Profile Scraper
+
+Scrape profiles filtered by company / country / industry.
+
+**Extracted:** name · current company · location · work history (title, company, date range, country) · industry
+
+```javascript
+// Single profile test:
+// Paste scrapeSingleProfile.js, then:
+const p = await scrapeSingleProfile(page, 'https://www.linkedin.com/in/username/');
+
+// Batch scrape:
+// Paste scrapeLinkedInProfiles.js, then:
+const results = await scrapeLinkedInProfiles(page, {
+  company: 'Google',
+  country: 'United States',
+  industry: 'Software Development',
+  maxProfiles: 20
+});
+console.log(JSON.stringify(results, null, 2));
+```
+
+Files: `scrapeLinkedInProfiles.js`, `scrapeSingleProfile.js`
+
+---
 
 ## Prerequisites
 
-User must be logged into LinkedIn with a complete profile and resume uploaded.
-
-## Limitations
-
-- Easy Apply only (skips complex multi-form applications)
-- Cannot solve CAPTCHA
-- Requires browser to remain open
-- Recommended max: 20–50 applications per session
+User must be logged into LinkedIn. Playwright MCP tools required.
