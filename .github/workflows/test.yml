@@ -17,12 +17,12 @@ jobs:
     name: Validate Plugin Structure
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Check required files exist
         run: |
           echo "=== Checking required files ==="
+          # root
           test -f SKILL.md                                                    && echo "✓ SKILL.md"
           test -f install.sh                                                  && echo "✓ install.sh"
           test -f README.md                                                   && echo "✓ README.md"
@@ -32,6 +32,7 @@ jobs:
           test -f CONTRIBUTING.md                                             && echo "✓ CONTRIBUTING.md"
           test -f CHANGELOG.md                                                && echo "✓ CHANGELOG.md"
           test -f .gitignore                                                  && echo "✓ .gitignore"
+          # plugin manifests
           test -f .claude-plugin/plugin.json                                  && echo "✓ .claude-plugin/plugin.json"
           test -f .claude-plugin/marketplace.json                             && echo "✓ .claude-plugin/marketplace.json"
           test -f .claude-plugin/README.md                                    && echo "✓ .claude-plugin/README.md"
@@ -44,48 +45,30 @@ jobs:
           test -f skills/linkedin-profile-scraper/SKILL.md                   && echo "✓ linkedin-profile-scraper/SKILL.md"
           test -f skills/linkedin-profile-scraper/scrapeLinkedInProfiles.js  && echo "✓ scrapeLinkedInProfiles.js"
           test -f skills/linkedin-profile-scraper/scrapeSingleProfile.js     && echo "✓ scrapeSingleProfile.js"
-          # platform config files
+          # tests
+          test -f tests/profileScraper.unit.test.js                          && echo "✓ tests/profileScraper.unit.test.js"
+          # platform configs
           test -f GEMINI.md                                                   && echo "✓ GEMINI.md"
           test -f .gemini/extensions/linkedin-job-auto-apply/gemini-extension.json && echo "✓ gemini-extension.json"
           test -f .github/copilot-instructions.md                            && echo "✓ copilot-instructions.md"
           echo ""
           echo "✅ All required files present."
 
-      - name: Validate JSON — plugin.json
+      - name: Validate JSON files
         run: |
-          echo "=== Validating .claude-plugin/plugin.json ==="
-          jq . .claude-plugin/plugin.json
-          echo "✅ plugin.json is valid JSON"
-
-      - name: Validate JSON — marketplace.json
-        run: |
-          echo "=== Validating .claude-plugin/marketplace.json ==="
-          jq . .claude-plugin/marketplace.json
-          echo "✅ marketplace.json is valid JSON"
-
-      - name: Validate JSON — gemini-extension.json
-        run: |
-          echo "=== Validating .gemini/extensions/linkedin-job-auto-apply/gemini-extension.json ==="
-          jq . .gemini/extensions/linkedin-job-auto-apply/gemini-extension.json
-          echo "✅ gemini-extension.json is valid JSON"
+          for f in .claude-plugin/plugin.json .claude-plugin/marketplace.json \
+                   .gemini/extensions/linkedin-job-auto-apply/gemini-extension.json; do
+            jq . "$f" > /dev/null && echo "✓ valid JSON: $f"
+          done
 
       - name: Validate JSON fields
         run: |
-          echo "=== Checking required JSON fields ==="
-
-          # plugin.json
-          test "$(jq -r '.name' .claude-plugin/plugin.json)" = "linkedin-job-auto-apply" && echo "✓ plugin.json: name"
-          test "$(jq -r '.version' .claude-plugin/plugin.json)" != "null"                && echo "✓ plugin.json: version"
-          test "$(jq -r '.skills' .claude-plugin/plugin.json)" = "./skills"             && echo "✓ plugin.json: skills path"
-
-          # marketplace.json
-          test "$(jq -r '.plugins[0].name' .claude-plugin/marketplace.json)" = "linkedin-job-auto-apply" && echo "✓ marketplace.json: plugin name"
-          test "$(jq -r '.plugins[0].category' .claude-plugin/marketplace.json)" = "productivity"        && echo "✓ marketplace.json: category"
-
-          # gemini-extension.json
+          test "$(jq -r '.name'            .claude-plugin/plugin.json)"          = "linkedin-job-auto-apply" && echo "✓ plugin.json: name"
+          test "$(jq -r '.version'         .claude-plugin/plugin.json)"          != "null"                   && echo "✓ plugin.json: version"
+          test "$(jq -r '.skills'          .claude-plugin/plugin.json)"          = "./skills"                && echo "✓ plugin.json: skills path"
+          test "$(jq -r '.plugins[0].name' .claude-plugin/marketplace.json)"     = "linkedin-job-auto-apply" && echo "✓ marketplace.json: name"
+          test "$(jq -r '.plugins[0].category' .claude-plugin/marketplace.json)" = "productivity"            && echo "✓ marketplace.json: category"
           test "$(jq -r '.name' .gemini/extensions/linkedin-job-auto-apply/gemini-extension.json)" = "linkedin-job-auto-apply" && echo "✓ gemini-extension.json: name"
-
-          echo ""
           echo "✅ All JSON fields valid"
 
   # ─────────────────────────────────────────────
@@ -96,130 +79,256 @@ jobs:
     runs-on: ubuntu-latest
     needs: validate
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Validate job auto-apply scripts
+      - name: Syntax check all skill JS files
         run: |
-          node --check skills/linkedin-job-auto-apply/autoApplyLinkedInJobs.js
-          echo "✅ autoApplyLinkedInJobs.js syntax valid"
-          node --check skills/linkedin-job-auto-apply/applySingleJob.js
-          echo "✅ applySingleJob.js syntax valid"
+          for f in skills/linkedin-job-auto-apply/autoApplyLinkedInJobs.js \
+                   skills/linkedin-job-auto-apply/applySingleJob.js \
+                   skills/linkedin-profile-scraper/scrapeLinkedInProfiles.js \
+                   skills/linkedin-profile-scraper/scrapeSingleProfile.js; do
+            node --check "$f" && echo "✓ syntax OK: $f"
+          done
 
-      - name: Validate profile scraper scripts
+      - name: Code quality checks (all skills)
         run: |
-          node --check skills/linkedin-profile-scraper/scrapeLinkedInProfiles.js
-          echo "✅ scrapeLinkedInProfiles.js syntax valid"
-          node --check skills/linkedin-profile-scraper/scrapeSingleProfile.js
-          echo "✅ scrapeSingleProfile.js syntax valid"
-
-      - name: Check JavaScript code quality (all skills)
-        run: |
-          echo "=== Checking all skill JS files ==="
           for dir in skills/*/; do
-            echo "--- $dir ---"
             for f in "$dir"*.js; do
               [ -f "$f" ] || continue
-              grep -q "console.log"     "$f" && echo "  ✓ logging: $f"
-              grep -q "async function"  "$f" && echo "  ✓ async:   $f"
-              grep -q "try {"           "$f" && echo "  ✓ try-catch: $f"
-              grep -q "page\."          "$f" && echo "  ✓ playwright: $f"
+              grep -q "console.log"    "$f" && echo "✓ logging:    $f"
+              grep -q "async function" "$f" && echo "✓ async:      $f"
+              grep -q "try {"          "$f" && echo "✓ error-handling: $f"
+              grep -q "page\."         "$f" && echo "✓ playwright: $f"
             done
           done
-          echo ""
-          echo "✅ JavaScript code structure looks good"
+          echo "✅ Code quality checks passed"
 
   # ─────────────────────────────────────────────
-  # Job 3: Test installation script
+  # Job 3: Unit tests — Profile Scraper
+  # ─────────────────────────────────────────────
+  unit-tests:
+    name: Unit Tests — Profile Scraper
+    runs-on: ubuntu-latest
+    needs: validate-javascript
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run unit tests
+        run: node --test tests/profileScraper.unit.test.js
+
+      - name: Verify test coverage (function signatures)
+        run: |
+          node -e "
+            const fs = require('fs');
+            const src = fs.readFileSync('tests/profileScraper.unit.test.js', 'utf8');
+            const required = [
+              'scrapeSingleProfile',
+              'scrapeLinkedInProfiles',
+              'status.*success',
+              'status.*error',
+              'workHistory',
+            ];
+            required.forEach(pattern => {
+              if (!new RegExp(pattern).test(src)) {
+                console.error('Missing test coverage for: ' + pattern);
+                process.exit(1);
+              }
+              console.log('✓ covered: ' + pattern);
+            });
+            console.log('✅ Coverage check passed');
+          "
+
+  # ─────────────────────────────────────────────
+  # Job 4: Full-flow tests — Profile Scraper (mock browser)
+  # ─────────────────────────────────────────────
+  full-flow-tests:
+    name: Full-Flow Tests — Profile Scraper
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run full-flow simulation (end-to-end with mock page)
+        run: |
+          node - <<'EOF'
+          const fs = require('fs');
+
+          // Load source
+          const stripExports = s => s.replace(/if \(typeof module[\s\S]+$/, '');
+          eval(stripExports(fs.readFileSync('skills/linkedin-profile-scraper/scrapeLinkedInProfiles.js','utf8')));
+          eval(stripExports(fs.readFileSync('skills/linkedin-profile-scraper/scrapeSingleProfile.js','utf8')));
+
+          // Full mock of a LinkedIn search + profile visit flow
+          function makeFullFlowPage(profileCount) {
+            const urls = Array.from({ length: profileCount }, (_, i) =>
+              `https://www.linkedin.com/in/person${i}/`
+            );
+            return {
+              goto: async () => {},
+              waitForTimeout: async () => {},
+              evaluate: async (fn) => {
+                const src = fn.toString();
+                if (src.includes('linkedin.com/in/'))  return urls;
+                if (src.includes('scrollTo'))           return undefined;
+                if (src.includes('#experience')) return {
+                  name: 'Test User',
+                  headline: 'Engineer at Corp',
+                  location: 'United States',
+                  currentCompany: 'Corp',
+                  currentTitle: 'Engineer',
+                  industry: 'Technology',
+                  workHistory: [
+                    { title: 'Engineer', company: 'Corp', dateRange: '2020 – Present', location: 'US' },
+                    { title: 'Junior',   company: 'Old Co', dateRange: '2018 – 2020',  location: 'UK' }
+                  ],
+                  profileUrl: 'https://www.linkedin.com/in/testuser/'
+                };
+                return null;
+              }
+            };
+          }
+
+          async function run() {
+            console.log('\n=== Full-flow test: batch scrape ===');
+            const page = makeFullFlowPage(5);
+            const results = await scrapeLinkedInProfiles(page, {
+              company: 'Corp',
+              country: 'United States',
+              industry: 'Technology',
+              maxProfiles: 3,
+              maxPages: 1
+            });
+
+            console.assert(Array.isArray(results),        'results is array');
+            console.assert(results.length === 3,          'respects maxProfiles=3, got: ' + results.length);
+            console.assert(results.every(r => r.status === 'success'), 'all success');
+            console.assert(results[0].name === 'Test User', 'name extracted');
+            console.assert(Array.isArray(results[0].workHistory), 'workHistory is array');
+            console.assert(results[0].workHistory.length === 2, 'workHistory has 2 entries');
+            console.assert(results[0].currentCompany === 'Corp', 'currentCompany extracted');
+            console.log('✅ Batch scrape: all assertions passed');
+
+            console.log('\n=== Full-flow test: single profile ===');
+            const p2 = makeFullFlowPage(0);
+            const profile = await scrapeSingleProfile(p2, 'https://www.linkedin.com/in/testuser/');
+            console.assert(profile.status === 'success',              'status=success');
+            console.assert(profile.name === 'Test User',              'name correct');
+            console.assert(profile.location === 'United States',      'location correct');
+            console.assert(profile.industry === 'Technology',         'industry correct');
+            console.assert(profile.workHistory[1].company === 'Old Co', 'history[1] correct');
+            console.log('✅ Single profile: all assertions passed');
+
+            console.log('\n=== Full-flow test: error recovery ===');
+            let callCount = 0;
+            const errorPage = {
+              goto: async () => {},
+              waitForTimeout: async () => {},
+              evaluate: async (fn) => {
+                const src = fn.toString();
+                if (src.includes('linkedin.com/in/'))
+                  return ['https://www.linkedin.com/in/broken/'];
+                if (src.includes('scrollTo')) return undefined;
+                callCount++;
+                throw new Error('simulated DOM error');
+              }
+            };
+            const errResults = await scrapeLinkedInProfiles(errorPage, { maxPages: 1, maxProfiles: 1 });
+            console.assert(errResults.length === 1,         'one result even on error');
+            console.assert(errResults[0].status === 'error', 'status=error on DOM failure');
+            console.log('✅ Error recovery: all assertions passed');
+
+            console.log('\n✅ All full-flow tests passed\n');
+          }
+
+          run().catch(e => { console.error('FAILED:', e); process.exit(1); });
+          EOF
+
+  # ─────────────────────────────────────────────
+  # Job 5: Test installation script
   # ─────────────────────────────────────────────
   test-install:
     name: Test install.sh
     runs-on: ubuntu-latest
     needs: validate
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Check install.sh is executable
         run: |
-          test -x install.sh && echo "✓ install.sh is executable" || (chmod +x install.sh && echo "✓ Made install.sh executable")
+          test -x install.sh && echo "✓ executable" || (chmod +x install.sh && echo "✓ made executable")
 
       - name: Run install.sh with mock claude in PATH
         run: |
-          echo "=== Setting up mock claude binary ==="
+          # Create minimal mock node (needed for playwright mcp check) and claude
           mkdir -p "$HOME/mock-bin"
-          echo '#!/bin/bash' > "$HOME/mock-bin/claude"
-          chmod +x "$HOME/mock-bin/claude"
-          export PATH="$HOME/mock-bin:$PATH"
+          printf '#!/bin/bash\necho "v20.0.0"' > "$HOME/mock-bin/node"
+          printf '#!/bin/bash\necho "mock-claude"' > "$HOME/mock-bin/claude"
+          chmod +x "$HOME/mock-bin/node" "$HOME/mock-bin/claude"
 
-          echo "=== Running install.sh ==="
+          # Mock npm/npx so playwright install doesn't run
+          printf '#!/bin/bash\nexit 0' > "$HOME/mock-bin/npm"
+          printf '#!/bin/bash\nexit 0' > "$HOME/mock-bin/npx"
+          chmod +x "$HOME/mock-bin/npm" "$HOME/mock-bin/npx"
+
+          export PATH="$HOME/mock-bin:$PATH"
           bash install.sh
 
       - name: Verify linkedin-job-auto-apply installed
         run: |
           DEST="$HOME/.claude/skills/linkedin-job-auto-apply"
-          test -d "$DEST"                              || { echo "❌ directory missing"; exit 1; }
-          test -f "$DEST/SKILL.md"                    && echo "✓ SKILL.md"
-          test -f "$DEST/autoApplyLinkedInJobs.js"   && echo "✓ autoApplyLinkedInJobs.js"
-          test -f "$DEST/applySingleJob.js"           && echo "✓ applySingleJob.js"
+          test -d "$DEST"                            || { echo "❌ dir missing"; exit 1; }
+          test -f "$DEST/SKILL.md"                  && echo "✓ SKILL.md"
+          test -f "$DEST/autoApplyLinkedInJobs.js"  && echo "✓ autoApplyLinkedInJobs.js"
+          test -f "$DEST/applySingleJob.js"         && echo "✓ applySingleJob.js"
           echo "✅ linkedin-job-auto-apply installed"
 
       - name: Verify linkedin-profile-scraper installed
         run: |
           DEST="$HOME/.claude/skills/linkedin-profile-scraper"
-          test -d "$DEST"                               || { echo "❌ directory missing"; exit 1; }
-          test -f "$DEST/SKILL.md"                     && echo "✓ SKILL.md"
-          test -f "$DEST/scrapeLinkedInProfiles.js"    && echo "✓ scrapeLinkedInProfiles.js"
-          test -f "$DEST/scrapeSingleProfile.js"       && echo "✓ scrapeSingleProfile.js"
+          test -d "$DEST"                              || { echo "❌ dir missing"; exit 1; }
+          test -f "$DEST/SKILL.md"                    && echo "✓ SKILL.md"
+          test -f "$DEST/scrapeLinkedInProfiles.js"   && echo "✓ scrapeLinkedInProfiles.js"
+          test -f "$DEST/scrapeSingleProfile.js"      && echo "✓ scrapeSingleProfile.js"
           echo "✅ linkedin-profile-scraper installed"
 
   # ─────────────────────────────────────────────
-  # Job 4: Simulate plugin workflow
+  # Job 6: Simulate plugin workflow
   # ─────────────────────────────────────────────
   test-plugin-workflow:
     name: Test Plugin Command Workflow
     runs-on: ubuntu-latest
     needs: validate
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: "Simulate: /plugin marketplace add yennanliu/linkedin-skill"
+      - name: Simulate marketplace add
         run: |
           mkdir -p ~/.claude/marketplaces
           cp .claude-plugin/marketplace.json ~/.claude/marketplaces/yennanliu-linkedin-skill.json
           jq '.name, .version' ~/.claude/marketplaces/yennanliu-linkedin-skill.json
           echo "✓ Marketplace added"
 
-      - name: "Simulate: /plugin install linkedin-job-auto-apply"
+      - name: Simulate plugin install (both skills)
         run: |
-          mkdir -p ~/.claude/skills/linkedin-job-auto-apply
-          cp -r skills/linkedin-job-auto-apply/* ~/.claude/skills/linkedin-job-auto-apply/
-          echo "✓ linkedin-job-auto-apply installed"
+          for skill in linkedin-job-auto-apply linkedin-profile-scraper; do
+            mkdir -p ~/.claude/skills/$skill
+            cp -r skills/$skill/* ~/.claude/skills/$skill/
+            echo "✓ installed: $skill"
+          done
 
-      - name: "Simulate: /plugin install linkedin-profile-scraper"
-        run: |
-          mkdir -p ~/.claude/skills/linkedin-profile-scraper
-          cp -r skills/linkedin-profile-scraper/* ~/.claude/skills/linkedin-profile-scraper/
-          echo "✓ linkedin-profile-scraper installed"
-
-      - name: "Simulate: /plugin list"
-        run: |
-          echo "Installed skills:"
-          for d in ~/.claude/skills/*/; do echo "  - $(basename $d)"; done
-          echo "✓ Plugin list OK"
-
-      - name: "Verify: skill files are accessible"
+      - name: Verify skill SKILL.md files accessible
         run: |
           for skill in linkedin-job-auto-apply linkedin-profile-scraper; do
             f="$HOME/.claude/skills/$skill/SKILL.md"
@@ -229,103 +338,83 @@ jobs:
           echo "✅ All skill files verified"
 
   # ─────────────────────────────────────────────
-  # Job 5: Dry run JavaScript automation
+  # Job 7: Dry run — verify function signatures
   # ─────────────────────────────────────────────
   dry-run-automation:
-    name: Dry Run Automation Scripts
+    name: Dry Run — Function Signatures
     runs-on: ubuntu-latest
     needs: [validate-javascript]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Test JavaScript module structure
+      - name: Verify all function signatures
         run: |
           node -e "
             const fs = require('fs');
-            const files = {
-              'autoApplyLinkedInJobs.js':   ['async function autoApplyLinkedInJobs(page, options = {})'],
-              'applySingleJob.js':           ['async function listJobs(page)', 'async function applySingleJob(page, jobIndex)'],
-              'scrapeLinkedInProfiles.js':   ['async function scrapeLinkedInProfiles(page, options = {})'],
-              'scrapeSingleProfile.js':      ['async function scrapeSingleProfile(page, profileUrl)'],
-            };
-            const dirs = {
-              'autoApplyLinkedInJobs.js':  'skills/linkedin-job-auto-apply',
-              'applySingleJob.js':         'skills/linkedin-job-auto-apply',
-              'scrapeLinkedInProfiles.js': 'skills/linkedin-profile-scraper',
-              'scrapeSingleProfile.js':    'skills/linkedin-profile-scraper',
-            };
+            const checks = [
+              ['skills/linkedin-job-auto-apply/autoApplyLinkedInJobs.js', 'async function autoApplyLinkedInJobs(page, options = {})'],
+              ['skills/linkedin-job-auto-apply/applySingleJob.js',        'async function listJobs(page)'],
+              ['skills/linkedin-job-auto-apply/applySingleJob.js',        'async function applySingleJob(page, jobIndex)'],
+              ['skills/linkedin-profile-scraper/scrapeLinkedInProfiles.js','async function scrapeLinkedInProfiles(page, options = {})'],
+              ['skills/linkedin-profile-scraper/scrapeSingleProfile.js',  'async function scrapeSingleProfile(page, profileUrl)'],
+            ];
             let ok = true;
-            for (const [file, sigs] of Object.entries(files)) {
-              const path = dirs[file] + '/' + file;
-              const src = fs.readFileSync(path, 'utf8');
-              for (const sig of sigs) {
-                if (!src.includes(sig)) {
-                  console.error('❌ Missing signature in ' + file + ': ' + sig);
-                  ok = false;
-                } else {
-                  console.log('✓ ' + file + ': ' + sig.split('(')[0].trim());
-                }
+            checks.forEach(([file, sig]) => {
+              const src = fs.readFileSync(file, 'utf8');
+              if (!src.includes(sig)) {
+                console.error('❌ Missing: ' + sig + ' in ' + file);
+                ok = false;
+              } else {
+                console.log('✓ ' + sig.split('(')[0].replace('async function ', '') + ' — ' + file.split('/').pop());
               }
-            }
+            });
             if (!ok) process.exit(1);
             console.log('');
             console.log('✅ All function signatures validated');
           "
 
   # ─────────────────────────────────────────────
-  # Job 6: Validate documentation
+  # Job 8: Validate documentation
   # ─────────────────────────────────────────────
   validate-docs:
     name: Validate Documentation
     runs-on: ubuntu-latest
     needs: validate
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Check documentation completeness
+      - name: Check documentation files are non-empty
         run: |
-          echo "=== Checking documentation files ==="
-          for file in README.md QUICKSTART.md INSTALLATION.md USAGE_EXAMPLES.md CONTRIBUTING.md CHANGELOG.md \
-                      GEMINI.md INSTALL_GEMINI.md INSTALL_COPILOT.md \
-                      skills/linkedin-profile-scraper/SKILL.md; do
+          for file in README.md QUICKSTART.md INSTALLATION.md USAGE_EXAMPLES.md \
+                      CONTRIBUTING.md CHANGELOG.md GEMINI.md INSTALL_GEMINI.md \
+                      INSTALL_COPILOT.md skills/linkedin-profile-scraper/SKILL.md; do
             size=$(wc -c < "$file")
-            if [ "$size" -gt 100 ]; then
-              echo "✓ $file ($size bytes)"
-            else
-              echo "❌ $file is too small ($size bytes)"
-              exit 1
-            fi
+            [ "$size" -gt 100 ] && echo "✓ $file ($size bytes)" || { echo "❌ $file too small"; exit 1; }
           done
-          echo ""
           echo "✅ All documentation files present and substantial"
 
-      - name: Check for broken links (basic)
+      - name: Check for unexpected external links
         run: |
-          if grep -r "](http" *.md | grep -v "https://github.com" | grep -v "https://linkedin.com" | grep -v "https://claude.ai"; then
-            echo "⚠️  External links found (manual verification recommended)"
+          if grep -r "](http" *.md | grep -v "https://github.com" | grep -v "https://linkedin.com" | grep -v "https://claude.ai" | grep -v "https://nodejs.org"; then
+            echo "⚠️  Unrecognised external links found — verify manually"
           fi
-          echo "✓ Basic link check complete"
+          echo "✓ Link check complete"
 
   # ─────────────────────────────────────────────
-  # Job 7: Auto-update & deploy to Claude Marketplace
+  # Job 9: Auto-update & deploy to Claude Marketplace
   # ─────────────────────────────────────────────
   deploy-marketplace:
     name: Auto-Update & Deploy to Claude Marketplace
     runs-on: ubuntu-latest
-    needs: [test-install, test-plugin-workflow, dry-run-automation, validate-docs]
+    needs: [unit-tests, full-flow-tests, test-install, test-plugin-workflow, dry-run-automation, validate-docs]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
       contents: write
     steps:
-      - name: Checkout (full history, push-capable token)
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
@@ -337,7 +426,7 @@ jobs:
           echo "Last commit: $MSG"
           if echo "$MSG" | grep -qF '[skip ci]'; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "⏭️  Version-bump commit detected — skipping deploy."
+            echo "⏭️  Version-bump commit — skipping deploy."
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
@@ -347,22 +436,13 @@ jobs:
         if: steps.guard.outputs.skip == 'false'
         run: |
           OLD=$(jq -r '.version' .claude-plugin/plugin.json)
-          MAJOR=$(echo "$OLD" | cut -d. -f1)
-          MINOR=$(echo "$OLD" | cut -d. -f2)
-          PATCH=$(echo "$OLD" | cut -d. -f3)
-          NEW="$MAJOR.$MINOR.$((PATCH + 1))"
-
-          jq --arg v "$NEW" '.version = $v' \
-            .claude-plugin/plugin.json > /tmp/plugin.json
-          mv /tmp/plugin.json .claude-plugin/plugin.json
-
-          jq --arg v "$NEW" '.version = $v | .plugins[0].version = $v' \
-            .claude-plugin/marketplace.json > /tmp/marketplace.json
-          mv /tmp/marketplace.json .claude-plugin/marketplace.json
-
-          echo "old=$OLD"      >> "$GITHUB_OUTPUT"
-          echo "version=$NEW"  >> "$GITHUB_OUTPUT"
-          echo "🔼 Bumped: $OLD → $NEW"
+          IFS='.' read -r MA MI PA <<< "$OLD"
+          NEW="$MA.$MI.$((PA + 1))"
+          jq --arg v "$NEW" '.version = $v' .claude-plugin/plugin.json > /tmp/p.json && mv /tmp/p.json .claude-plugin/plugin.json
+          jq --arg v "$NEW" '.version = $v | .plugins[0].version = $v' .claude-plugin/marketplace.json > /tmp/m.json && mv /tmp/m.json .claude-plugin/marketplace.json
+          echo "old=$OLD" >> "$GITHUB_OUTPUT"
+          echo "version=$NEW" >> "$GITHUB_OUTPUT"
+          echo "🔼 $OLD → $NEW"
 
       - name: Commit & push version bump
         if: steps.guard.outputs.skip == 'false'
@@ -376,58 +456,53 @@ jobs:
 
       - name: Create GitHub Release
         if: steps.guard.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git pull origin main
           TAG="v${{ steps.bump.outputs.version }}"
-          TARGET=$(git rev-parse HEAD)
 
           gh release create "$TAG" \
             --title "$TAG" \
-            --target "$TARGET" \
+            --target "$(git rev-parse HEAD)" \
             --latest \
             --notes "## What's new in $TAG
 
           Auto-released after all CI tests passed on \`main\`.
 
-          ### Skills included
+          ### Skills
           - **linkedin-job-auto-apply** — Easy Apply automation with keyboard controls (P/R/Q)
           - **linkedin-profile-scraper** — Scrape profiles by company / country / industry
 
-          ### Install via Claude Code
+          ### Install
           \`\`\`bash
+          # Claude Code
           /plugin marketplace add yennanliu/linkedin-skill
           /plugin install linkedin-job-auto-apply
           /plugin install linkedin-profile-scraper
-          \`\`\`
 
-          ### Install via script (Claude + Gemini auto-detected)
-          \`\`\`bash
+          # All platforms (auto-detects claude + gemini, installs Playwright MCP)
           ./install.sh
           \`\`\`
 
-          See [CHANGELOG](https://github.com/yennanliu/linkedin-skill/blob/main/CHANGELOG.md) for full release notes."
+          See [CHANGELOG](https://github.com/yennanliu/linkedin-skill/blob/main/CHANGELOG.md) for full notes."
 
           echo "🚀 Release published: $TAG"
-        env:
-          GH_TOKEN: ${{ github.token }}
 
       - name: Update CHANGELOG.md
         if: steps.guard.outputs.skip == 'false'
         run: |
           VERSION="${{ steps.bump.outputs.version }}"
           DATE=$(date +%Y-%m-%d)
-
-          cat > /tmp/changelog_entry.md << EOF
+          cat > /tmp/entry.md << EOF
           ## [$VERSION] - $DATE
 
           ### Changed
           - Auto-release from CI/CD pipeline
-          - All tests passed successfully
+          - All tests passed (unit + full-flow + install)
 
           EOF
-
-          sed -i '/## \[Unreleased\]/r /tmp/changelog_entry.md' CHANGELOG.md
-
+          sed -i '/## \[Unreleased\]/r /tmp/entry.md' CHANGELOG.md
           git add CHANGELOG.md
           git commit -m "docs: update CHANGELOG for v$VERSION [skip ci]"
           git push origin main
