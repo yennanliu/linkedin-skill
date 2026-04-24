@@ -1,98 +1,98 @@
 #!/bin/bash
 
-# LinkedIn Job Auto-Apply Skill Installer
-# This script installs the LinkedIn job automation skill to Claude Code
+# LinkedIn Job Auto-Apply — Multi-Platform Installer
+# Supports: Claude Code, Gemini CLI, GitHub Copilot
 
 set -e
 
-# Colors for output
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Print colored message
-print_message() {
-    local color=$1
-    local message=$2
-    echo -e "${color}${message}${NC}"
+msg()  { echo -e "${2}${1}${NC}"; }
+ok()   { msg "✓ $1" "$GREEN"; }
+info() { msg "$1" "$BLUE"; }
+warn() { msg "⚠  $1" "$YELLOW"; }
+err()  { msg "✗ $1" "$RED"; }
+
+SKILL_DIR="skills/linkedin-job-auto-apply"
+
+install_claude() {
+  info "Installing for Claude Code..."
+  DEST="$HOME/.claude/skills/linkedin-job-auto-apply"
+  if [ -d "$DEST" ]; then
+    warn "Already installed at $DEST — overwriting."
+    rm -rf "$DEST"
+  fi
+  mkdir -p "$DEST"
+  cp -r "$SKILL_DIR"/* "$DEST/"
+  [ -f "$DEST/SKILL.md" ] && ok "Claude Code: installed to $DEST" || { err "Claude Code install failed"; return 1; }
+  echo "  Usage: claude → /linkedin-job-auto-apply"
 }
 
-print_message "$BLUE" "========================================"
-print_message "$BLUE" "LinkedIn Auto-Apply Skill Installer"
-print_message "$BLUE" "========================================"
+install_gemini() {
+  info "Installing for Gemini CLI..."
+  DEST="$HOME/.gemini/extensions/linkedin-job-auto-apply"
+  mkdir -p "$DEST"
+  cp ".gemini/extensions/linkedin-job-auto-apply/gemini-extension.json" "$DEST/"
+  cp ".gemini/extensions/linkedin-job-auto-apply/GEMINI.md" "$DEST/"
+  # Include JS files so Gemini can reference them
+  cp "$SKILL_DIR/autoApplyLinkedInJobs.js" "$DEST/"
+  cp "$SKILL_DIR/applySingleJob.js" "$DEST/"
+  [ -f "$DEST/gemini-extension.json" ] && ok "Gemini CLI: installed to $DEST" || { err "Gemini CLI install failed"; return 1; }
+  echo "  Usage: gemini → ask about LinkedIn job automation"
+}
+
+install_copilot() {
+  info "Installing for GitHub Copilot..."
+  mkdir -p ".github"
+  cp ".github/copilot-instructions.md" ".github/copilot-instructions.md" 2>/dev/null || true
+  ok "Copilot: .github/copilot-instructions.md is ready (commit it to your repo)"
+  echo "  Usage: commit .github/copilot-instructions.md — Copilot picks it up automatically"
+}
+
+echo ""
+info "========================================"
+info "  LinkedIn Auto-Apply — Installer"
+info "========================================"
 echo ""
 
-# Check if Claude Code is installed
-if ! command -v claude &> /dev/null; then
-    print_message "$RED" "Error: Claude Code is not installed or not in PATH"
-    print_message "$YELLOW" "Please install Claude Code first: https://claude.ai/code"
-    exit 1
+# Auto-detect or let user choose
+INSTALLED=0
+
+if command -v claude &>/dev/null; then
+  install_claude && INSTALLED=$((INSTALLED+1))
+  echo ""
 fi
 
-print_message "$GREEN" "✓ Claude Code found"
-
-# Determine installation directory
-CLAUDE_DIR="$HOME/.claude"
-SKILLS_DIR="$CLAUDE_DIR/skills"
-INSTALL_DIR="$SKILLS_DIR/linkedin-job-auto-apply"
-
-# Create directories if they don't exist
-print_message "$BLUE" "Creating installation directories..."
-mkdir -p "$SKILLS_DIR"
-
-# Check if skill already exists
-if [ -d "$INSTALL_DIR" ]; then
-    print_message "$YELLOW" "Warning: LinkedIn skill already exists at $INSTALL_DIR"
-    read -p "Do you want to overwrite it? (y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        print_message "$RED" "Installation cancelled"
-        exit 1
-    fi
-    rm -rf "$INSTALL_DIR"
+if command -v gemini &>/dev/null; then
+  install_gemini && INSTALLED=$((INSTALLED+1))
+  echo ""
 fi
 
-# Copy skill files
-print_message "$BLUE" "Installing LinkedIn Auto-Apply skill..."
-mkdir -p "$INSTALL_DIR"
+# Copilot: install if .github dir already exists or if neither Claude nor Gemini found
+if [ -d ".github" ] || [ "$INSTALLED" -eq 0 ]; then
+  install_copilot && INSTALLED=$((INSTALLED+1))
+  echo ""
+fi
 
-# Copy skill directory
-cp -r skills/linkedin-job-auto-apply/* "$INSTALL_DIR/"
-
-# Create a simple verification
-if [ -f "$INSTALL_DIR/SKILL.md" ]; then
-    print_message "$GREEN" "✓ Skill files installed successfully"
-else
-    print_message "$RED" "Error: Installation failed - SKILL.md not found"
-    exit 1
+if [ "$INSTALLED" -eq 0 ]; then
+  err "No supported AI CLI found (claude, gemini)."
+  echo ""
+  echo "Manual install options:"
+  echo "  Claude Code : cp -r $SKILL_DIR ~/.claude/skills/linkedin-job-auto-apply"
+  echo "  Gemini CLI  : cp -r .gemini/extensions/linkedin-job-auto-apply ~/.gemini/extensions/"
+  echo "  Copilot     : commit .github/copilot-instructions.md to your repo"
+  exit 1
 fi
 
 echo ""
-print_message "$GREEN" "========================================"
-print_message "$GREEN" "Installation Complete!"
-print_message "$GREEN" "========================================"
+info "========================================"
+ok "Done! $INSTALLED platform(s) configured."
+info "========================================"
 echo ""
-
-print_message "$BLUE" "Installation location: $INSTALL_DIR"
+echo "Next: make sure you're logged into LinkedIn, then start your AI assistant."
+echo "Docs: INSTALLATION.md | QUICKSTART.md | USAGE_EXAMPLES.md"
 echo ""
-
-print_message "$YELLOW" "Next steps:"
-echo "  1. Start Claude Code: claude"
-echo "  2. Use the skill: /linkedin-job-auto-apply"
-echo "  3. Or ask: \"Help me apply to jobs on LinkedIn\""
-echo ""
-
-print_message "$BLUE" "Quick test:"
-echo "  In Claude Code, try:"
-echo "  /linkedin-job-auto-apply"
-echo ""
-
-print_message "$YELLOW" "Documentation:"
-echo "  - Quick Start: $INSTALL_DIR/QUICKSTART.md"
-echo "  - Full Docs: $INSTALL_DIR/SKILL.md"
-echo "  - Examples: $INSTALL_DIR/USAGE_EXAMPLES.md"
-echo ""
-
-print_message "$GREEN" "Happy job hunting! 🎯"

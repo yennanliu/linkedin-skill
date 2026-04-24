@@ -4,7 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A Claude Code plugin/skill that automates LinkedIn job applications via Playwright MCP browser automation. It is distributed as a Claude Code marketplace plugin (`yennanliu/linkedin-skill`) and installed via `/plugin` commands.
+A multi-platform AI skill that automates LinkedIn job applications via Playwright MCP browser automation. Supports Claude Code (primary), Gemini CLI, and GitHub Copilot.
+
+| Platform | Config file | Install dir |
+|----------|-------------|-------------|
+| Claude Code | `SKILL.md` | `~/.claude/skills/linkedin-job-auto-apply/` |
+| Gemini CLI | `GEMINI.md` / `.gemini/extensions/…/GEMINI.md` | `~/.gemini/extensions/linkedin-job-auto-apply/` |
+| GitHub Copilot | `.github/copilot-instructions.md` | committed to repo |
 
 ## Plugin Installation (End-User Flow)
 

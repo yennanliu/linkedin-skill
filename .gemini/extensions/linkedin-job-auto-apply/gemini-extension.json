@@ -1,0 +1,6 @@
+{
+  "name": "linkedin-job-auto-apply",
+  "version": "1.0.0",
+  "description": "Automate LinkedIn job applications using Playwright browser automation. Supports Easy Apply jobs with target-based stopping, keyboard controls (P/R/Q), and smart job filtering.",
+  "contextFileName": "GEMINI.md"
+}

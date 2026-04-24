@@ -1,28 +1,29 @@
 # Installation Guide
 
-Complete installation instructions for the LinkedIn Auto-Apply skill.
+Supports **Claude Code**, **Gemini CLI**, and **GitHub Copilot**.
 
-## Prerequisites
+| Platform | Guide |
+|----------|-------|
+| Claude Code | This file (below) |
+| Gemini CLI | [INSTALL_GEMINI.md](./INSTALL_GEMINI.md) |
+| GitHub Copilot | [INSTALL_COPILOT.md](./INSTALL_COPILOT.md) |
 
-Before installing, ensure you have:
+**One-command install** (auto-detects installed AI CLIs):
+```bash
+git clone https://github.com/yennanliu/linkedin-skill.git
+cd linkedin-skill
+./install.sh
+```
 
-1. **Claude Code installed**
-   - Download from: https://claude.ai/code
-   - Verify installation: `claude --version`
+---
 
-2. **Playwright MCP tools configured**
-   - Should be set up in Claude Code
-   - Test by starting Claude and checking available tools
+## Claude Code Installation
 
-3. **LinkedIn account**
-   - Active LinkedIn account
-   - Complete profile with resume uploaded
-   - Valid login credentials
+### Prerequisites
 
-4. **System requirements**
-   - macOS, Linux, or Windows
-   - Stable internet connection
-   - Modern web browser
+1. **Claude Code** — [claude.ai/code](https://claude.ai/code)
+2. **Playwright MCP tools** configured in Claude Code
+3. **LinkedIn account** — logged in, with resume uploaded
 
 ## Installation Methods
 
