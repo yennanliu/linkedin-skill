@@ -56,6 +56,8 @@ console.log(JSON.stringify(results, null, 2));
 
 Full instructions: `skills/linkedin-profile-scraper/SKILL.md`
 
+Detailed usage guide: `PROFILE_SCRAPER.md`
+
 ---
 
 ## Prerequisites (both skills)
