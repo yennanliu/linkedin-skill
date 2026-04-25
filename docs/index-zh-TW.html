@@ -1,14 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Automate LinkedIn job applications and scrape LinkedIn profiles with Claude Code AI - Playwright MCP skills">
-    <title>LinkedIn Skills | Claude Code &amp; Gemini CLI</title>
+    <meta name="description" content="使用 Claude Code AI 自動化 LinkedIn 職缺申請與個人檔案爬取 — Playwright MCP 技能套件">
+    <title>LinkedIn 技能套件 | Claude Code &amp; Gemini CLI</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .lang-switcher {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            color: white;
+            transition: background 0.2s;
+        }
+        .lang-switcher:hover { background: rgba(255,255,255,0.25); color: white; }
+        .navbar .lang-switcher { color: #444; background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.12); }
+        .navbar .lang-switcher:hover { background: rgba(0,0,0,0.1); }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -21,14 +40,14 @@
                         <path d="M10 13H14V24H10V13ZM12 8C13.1 8 14 8.9 14 10C14 11.1 13.1 12 12 12C10.9 12 10 11.1 10 10C10 8.9 10.9 8 12 8Z" fill="white"/>
                         <path d="M16 13H20V15H20.1C20.6 14.1 21.9 13 23.8 13C27.7 13 28 15.5 28 18.4V24H24V19.2C24 17.4 24 15.1 21.5 15.1C19 15.1 18.6 17.1 18.6 19.1V24H14.6V13H16Z" fill="white"/>
                     </svg>
-                    <span class="logo-text">LinkedIn Skills</span>
+                    <span class="logo-text">LinkedIn 技能套件</span>
                 </div>
                 <div class="nav-links">
-                    <a href="#skills">Skills</a>
-                    <a href="#features">Features</a>
-                    <a href="#installation">Get Started</a>
-                    <a href="#docs">Docs</a>
-                    <a href="index-zh-TW.html" style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.12);border-radius:20px;padding:4px 12px;font-size:13px;font-weight:500;text-decoration:none;color:#444;">🌐 繁體中文</a>
+                    <a href="#skills">技能</a>
+                    <a href="#features">功能</a>
+                    <a href="#installation">開始使用</a>
+                    <a href="#docs">文件</a>
+                    <a href="index.html" class="lang-switcher">🌐 English</a>
                     <a href="https://github.com/yennanliu/linkedin-skill" target="_blank" class="btn-github">
                         <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
                             <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
@@ -49,14 +68,14 @@
                         <circle cx="12" cy="12" r="10"/>
                         <path d="M12 6v6l4 2"/>
                     </svg>
-                    Claude Code &amp; Gemini CLI Skills
+                    Claude Code &amp; Gemini CLI 技能套件
                 </div>
                 <h1 class="hero-title">
-                    Automate <span class="linkedin-text">LinkedIn</span> with AI
+                    用 AI 自動化你的 <span class="linkedin-text">LinkedIn</span>
                 </h1>
                 <p class="hero-subtitle">
-                    Two Playwright MCP skills: batch Easy Apply job automation and profile scraping by company, country, or industry.
-                    Works with Claude Code and Gemini CLI.
+                    兩個 Playwright MCP 技能：批次投遞 Easy Apply 職缺，以及依公司、國家、產業爬取個人檔案。
+                    支援 Claude Code 與 Gemini CLI。
                 </p>
                 <div class="hero-buttons">
                     <a href="#installation" class="btn-primary">
@@ -65,10 +84,10 @@
                             <polyline points="7 10 12 15 17 10"/>
                             <line x1="12" y1="15" x2="12" y2="3"/>
                         </svg>
-                        Get Started Free
+                        免費開始使用
                     </a>
                     <a href="https://github.com/yennanliu/linkedin-skill" target="_blank" class="btn-secondary">
-                        View on GitHub
+                        在 GitHub 上查看
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
                             <polyline points="15 3 21 3 21 9"/>
@@ -78,16 +97,16 @@
                 </div>
                 <div class="hero-stats">
                     <div class="stat-item">
-                        <div class="stat-number">2 Skills</div>
-                        <div class="stat-label">Auto-Apply &amp; Scraper</div>
+                        <div class="stat-number">2 項技能</div>
+                        <div class="stat-label">自動投遞 &amp; 資料爬取</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">Smart</div>
-                        <div class="stat-label">Filter &amp; Skip Logic</div>
+                        <div class="stat-number">智慧</div>
+                        <div class="stat-label">過濾與略過邏輯</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">Safe</div>
-                        <div class="stat-label">Human-Like Delays</div>
+                        <div class="stat-number">安全</div>
+                        <div class="stat-label">擬人化延遲機制</div>
                     </div>
                 </div>
             </div>
@@ -98,22 +117,22 @@
     <section id="skills" class="features">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Two Skills, One Package</h2>
-                <p class="section-subtitle">Install once, use both</p>
+                <h2 class="section-title">兩項技能，一次安裝</h2>
+                <p class="section-subtitle">安裝一次，即可使用兩項技能</p>
             </div>
 
             <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));">
                 <div class="feature-card" style="border-top: 4px solid #0A66C2;">
                     <div class="feature-icon">💼</div>
-                    <h3>Job Auto-Apply</h3>
-                    <p>Batch-apply to LinkedIn Easy Apply jobs. Set a target count, use keyboard controls (P/R/Q), and get a visual on-page progress indicator.</p>
+                    <h3>自動投遞職缺</h3>
+                    <p>批次投遞 LinkedIn Easy Apply 職缺。設定目標數量、使用鍵盤控制（P/R/Q），並透過頁面浮動視窗即時查看進度。遇到問卷表單時自動填入預設值。</p>
                     <p style="margin-top:1rem;"><code>/linkedin-job-auto-apply</code></p>
                 </div>
 
                 <div class="feature-card" style="border-top: 4px solid #057642;">
                     <div class="feature-icon">🔎</div>
-                    <h3>Profile Scraper</h3>
-                    <p>Scrape structured profile data (name, title, company, work history) filtered by company, country, and industry. Export as JSON.</p>
+                    <h3>個人檔案爬取</h3>
+                    <p>依公司、國家、產業爬取結構化個人檔案資料（姓名、職稱、公司、工作經歷），並匯出為 JSON 格式。</p>
                     <p style="margin-top:1rem;"><code>/linkedin-profile-scraper</code></p>
                 </div>
             </div>
@@ -124,45 +143,45 @@
     <section id="features" class="features" style="background:#f8fafc;">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Powerful Features</h2>
-                <p class="section-subtitle">Everything you need across both skills</p>
+                <h2 class="section-title">強大功能</h2>
+                <p class="section-subtitle">兩項技能涵蓋的所有核心功能</p>
             </div>
 
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-icon">⚡</div>
-                    <h3>Lightning Fast Apply</h3>
-                    <p>Apply to 20-50 Easy Apply jobs automatically. Batch process multiple pages with target-based stopping.</p>
+                    <h3>高速批次投遞</h3>
+                    <p>自動投遞 20–50 份 Easy Apply 職缺，批次處理多頁搜尋結果，達到目標數量後自動停止。</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">🗂️</div>
-                    <h3>Profile Scraping</h3>
-                    <p>Scrape structured profile data filtered by company, country, and industry. Returns JSON with full work history.</p>
+                    <h3>個人檔案爬取</h3>
+                    <p>依公司、國家、產業爬取結構化個人檔案，回傳包含完整工作經歷的 JSON 資料。</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">⌨️</div>
-                    <h3>Keyboard Controls</h3>
-                    <p>Press P to pause, R to resume, Q to quit. Full control during automation with real-time monitoring.</p>
+                    <h3>鍵盤控制</h3>
+                    <p>按 P 暫停、R 繼續、Q 結束。自動化執行期間可全程掌控，並即時監控進度。</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">🛡️</div>
-                    <h3>Safe & Secure</h3>
-                    <p>Built-in delays (2-4 seconds), error handling, and rate limiting. Respects LinkedIn's terms.</p>
+                    <h3>安全可靠</h3>
+                    <p>內建延遲（2–4 秒）、錯誤處理與速率限制，在合理範圍內使用 LinkedIn。</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">📊</div>
-                    <h3>On-Page Status</h3>
-                    <p>Visual progress indicator shows applications count, current page, and automation state.</p>
+                    <h3>頁面狀態顯示</h3>
+                    <p>浮動進度視窗即時顯示申請數量、目前頁碼與自動化狀態。</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">🔍</div>
-                    <h3>Smart Filtering</h3>
-                    <p>Automatically skips already-applied jobs and non-Easy Apply positions. Scraper filters by company/country/industry.</p>
+                    <h3>智慧過濾</h3>
+                    <p>自動略過已申請及非 Easy Apply 職缺；爬取器依公司／國家／產業精準篩選。</p>
                 </div>
             </div>
         </div>
@@ -172,16 +191,16 @@
     <section id="how-it-works" class="how-it-works">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">How It Works</h2>
-                <p class="section-subtitle">Simple automation in 3 steps</p>
+                <h2 class="section-title">運作方式</h2>
+                <p class="section-subtitle">三個步驟，簡單自動化</p>
             </div>
 
             <div class="steps">
                 <div class="step-card">
                     <div class="step-number">1</div>
                     <div class="step-content">
-                        <h3>Install the Skill</h3>
-                        <p>Add both skills to Claude Code via marketplace</p>
+                        <h3>安裝技能</h3>
+                        <p>透過 Marketplace 將兩項技能加入 Claude Code</p>
                         <div class="code-snippet">
                             <code>/plugin install linkedin-job-auto-apply</code>
                         </div>
@@ -194,8 +213,8 @@
                 <div class="step-card">
                     <div class="step-number">2</div>
                     <div class="step-content">
-                        <h3>Configure Settings</h3>
-                        <p>Set your target applications, search keywords, and location preferences</p>
+                        <h3>設定參數</h3>
+                        <p>設定目標申請數量、搜尋關鍵字與地點偏好</p>
                         <div class="code-snippet">
                             <code>targetApplications: 20, keywords: "software engineer"</code>
                         </div>
@@ -205,10 +224,10 @@
                 <div class="step-card">
                     <div class="step-number">3</div>
                     <div class="step-content">
-                        <h3>Start Applying</h3>
-                        <p>Watch as Easy Apply jobs are processed automatically with real-time status</p>
+                        <h3>開始自動投遞</h3>
+                        <p>觀看 Easy Apply 職缺自動處理，並即時查看狀態</p>
                         <div class="code-snippet">
-                            <code>✅ 20/20 applications submitted successfully!</code>
+                            <code>✅ 20/20 份申請已成功送出！</code>
                         </div>
                     </div>
                 </div>
@@ -221,28 +240,28 @@
         <div class="container">
             <div class="install-grid">
                 <div class="install-info">
-                    <h2>Ready to Get Started?</h2>
+                    <h2>準備好開始了嗎？</h2>
                     <p class="install-description">
-                        Install in under 30 seconds and start automating your LinkedIn job applications today.
+                        30 秒內完成安裝，立即開始自動化你的 LinkedIn 求職流程。
                     </p>
                     <div class="install-benefits">
                         <div class="benefit-item">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0A66C2" stroke-width="2">
                                 <polyline points="20 6 9 17 4 12"/>
                             </svg>
-                            <span>No signup required</span>
+                            <span>無需額外註冊</span>
                         </div>
                         <div class="benefit-item">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0A66C2" stroke-width="2">
                                 <polyline points="20 6 9 17 4 12"/>
                             </svg>
-                            <span>Free and open source</span>
+                            <span>免費開源</span>
                         </div>
                         <div class="benefit-item">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0A66C2" stroke-width="2">
                                 <polyline points="20 6 9 17 4 12"/>
                             </svg>
-                            <span>Works with Claude Code</span>
+                            <span>支援 Claude Code &amp; Gemini CLI</span>
                         </div>
                     </div>
                 </div>
@@ -254,7 +273,7 @@
                                 <span class="dot yellow"></span>
                                 <span class="dot green"></span>
                             </div>
-                            <span class="terminal-title">Terminal</span>
+                            <span class="terminal-title">終端機</span>
                         </div>
                         <div class="terminal-body">
                             <div class="terminal-line">
@@ -274,7 +293,7 @@
                                 <span class="command">/plugin install linkedin-profile-scraper</span>
                             </div>
                             <div class="terminal-line success">
-                                <span>✅ Both skills installed!</span>
+                                <span>✅ 兩項技能安裝完成！</span>
                             </div>
                             <div class="terminal-line">
                                 <span class="prompt">&gt;</span>
@@ -295,51 +314,51 @@
     <section id="docs" class="docs">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Documentation</h2>
-                <p class="section-subtitle">Comprehensive guides and references</p>
+                <h2 class="section-title">技術文件</h2>
+                <p class="section-subtitle">完整指南與參考資料</p>
             </div>
 
             <div class="docs-grid">
                 <a href="https://github.com/yennanliu/linkedin-skill/blob/main/QUICKSTART.md" class="doc-card" target="_blank">
                     <div class="doc-icon">🚀</div>
-                    <h3>Quick Start Guide</h3>
-                    <p>Get up and running in 5 minutes with step-by-step instructions</p>
-                    <span class="doc-link">Read Guide →</span>
+                    <h3>快速開始指南</h3>
+                    <p>依照步驟說明，5 分鐘內完成設定並開始使用</p>
+                    <span class="doc-link">閱讀指南 →</span>
                 </a>
 
                 <a href="https://github.com/yennanliu/linkedin-skill/blob/main/skills/linkedin-job-auto-apply/SKILL.md" class="doc-card" target="_blank">
                     <div class="doc-icon">💼</div>
-                    <h3>Job Auto-Apply Skill</h3>
-                    <p>Complete technical reference for the Easy Apply automation skill</p>
-                    <span class="doc-link">Read Docs →</span>
+                    <h3>自動投遞職缺技能</h3>
+                    <p>Easy Apply 自動化技能的完整技術參考文件</p>
+                    <span class="doc-link">閱讀文件 →</span>
                 </a>
 
                 <a href="https://github.com/yennanliu/linkedin-skill/blob/main/PROFILE_SCRAPER.md" class="doc-card" target="_blank">
                     <div class="doc-icon">🔎</div>
-                    <h3>Profile Scraper Guide</h3>
-                    <p>How to scrape LinkedIn profiles by company, country, and industry — with output examples</p>
-                    <span class="doc-link">Read Guide →</span>
+                    <h3>個人檔案爬取指南</h3>
+                    <p>如何依公司、國家、產業爬取 LinkedIn 個人檔案，含輸出範例</p>
+                    <span class="doc-link">閱讀指南 →</span>
                 </a>
 
                 <a href="https://github.com/yennanliu/linkedin-skill/blob/main/skills/linkedin-profile-scraper/SKILL.md" class="doc-card" target="_blank">
                     <div class="doc-icon">📚</div>
-                    <h3>Profile Scraper Skill</h3>
-                    <p>Full skill reference including all configuration options and selectors</p>
-                    <span class="doc-link">Read Docs →</span>
+                    <h3>個人檔案爬取技能</h3>
+                    <p>包含所有設定選項與 DOM 選擇器的完整技能參考文件</p>
+                    <span class="doc-link">閱讀文件 →</span>
                 </a>
 
                 <a href="https://github.com/yennanliu/linkedin-skill/blob/main/USAGE_EXAMPLES.md" class="doc-card" target="_blank">
                     <div class="doc-icon">💡</div>
-                    <h3>Usage Examples</h3>
-                    <p>Real-world scenarios and practical workflows for both skills</p>
-                    <span class="doc-link">View Examples →</span>
+                    <h3>使用範例</h3>
+                    <p>兩項技能的實際應用場景與工作流程範例</p>
+                    <span class="doc-link">查看範例 →</span>
                 </a>
 
                 <a href="https://github.com/yennanliu/linkedin-skill/blob/main/INSTALLATION.md" class="doc-card" target="_blank">
                     <div class="doc-icon">⚙️</div>
-                    <h3>Installation Guide</h3>
-                    <p>Detailed setup instructions for Claude Code, Gemini CLI, and GitHub Copilot</p>
-                    <span class="doc-link">Read Guide →</span>
+                    <h3>安裝指南</h3>
+                    <p>Claude Code、Gemini CLI 與 GitHub Copilot 的詳細安裝說明</p>
+                    <span class="doc-link">閱讀指南 →</span>
                 </a>
             </div>
         </div>
@@ -349,53 +368,58 @@
     <section class="faq">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Frequently Asked Questions</h2>
+                <h2 class="section-title">常見問題</h2>
             </div>
 
             <div class="faq-list">
                 <details class="faq-item">
-                    <summary>Is this safe to use with my LinkedIn account?</summary>
-                    <p>Yes, the automation includes safety features like human-like delays (2-4 seconds), rate limiting, and error handling. However, use responsibly and avoid excessive automation. LinkedIn may flag suspicious activity.</p>
+                    <summary>使用這個工具對 LinkedIn 帳號安全嗎？</summary>
+                    <p>是的，自動化工具內建擬人化延遲（2–4 秒）、速率限制與錯誤處理等安全機制。但請負責任地使用，避免過度自動化操作。LinkedIn 可能會偵測到異常活動。</p>
                 </details>
 
                 <details class="faq-item">
-                    <summary>What is Easy Apply?</summary>
-                    <p>Easy Apply is LinkedIn's one-click application feature. This skill focuses on Easy Apply jobs because they're simple and fast. Complex applications requiring cover letters or assessments are automatically skipped.</p>
+                    <summary>什麼是 Easy Apply？</summary>
+                    <p>Easy Apply 是 LinkedIn 的一鍵申請功能。本技能專注於 Easy Apply 職缺，因為流程簡單快速。需要附上求職信或填寫評估測驗的複雜申請會自動略過。</p>
                 </details>
 
                 <details class="faq-item">
-                    <summary>How many jobs should I apply to per session?</summary>
-                    <p>We recommend 20-50 applications per session. Quality matters more than quantity. Take breaks between sessions (several hours) to avoid rate limiting.</p>
+                    <summary>每次使用應該投遞多少份申請？</summary>
+                    <p>建議每次使用投遞 20–50 份。質量比數量更重要。每次使用之間請間隔數小時，以避免速率限制。</p>
                 </details>
 
                 <details class="faq-item">
-                    <summary>Can I pause or stop the automation?</summary>
-                    <p>Yes! Use keyboard controls: Press P to pause, R to resume, and Q to quit gracefully. The on-page status indicator shows your current progress.</p>
+                    <summary>可以暫停或停止自動化嗎？</summary>
+                    <p>可以！使用鍵盤控制：按 P 暫停、R 繼續、Q 優雅結束。頁面上的狀態視窗會顯示目前的進度。</p>
                 </details>
 
                 <details class="faq-item">
-                    <summary>Will it skip jobs I've already applied to?</summary>
-                    <p>Yes, the automation automatically detects and skips jobs you've already applied to, saving time and avoiding duplicate applications.</p>
+                    <summary>遇到問卷或申請表單時怎麼辦？</summary>
+                    <p>系統會自動以合理預設值填寫表單欄位（例如電話填入示範號碼、年資填入 3 年、下拉選單選擇第一個選項），然後繼續申請流程，不會跳過該職缺。</p>
                 </details>
 
                 <details class="faq-item">
-                    <summary>What if I encounter a CAPTCHA?</summary>
-                    <p>If LinkedIn shows a CAPTCHA, you'll need to solve it manually. This usually happens if LinkedIn detects unusual activity. Wait several hours before trying again.</p>
+                    <summary>已申請過的職缺會重複申請嗎？</summary>
+                    <p>不會。自動化工具會自動偵測並略過已申請的職缺，節省時間並避免重複申請。</p>
                 </details>
 
                 <details class="faq-item">
-                    <summary>What data does the Profile Scraper extract?</summary>
-                    <p>The scraper extracts: full name, headline, location, current company, current title, industry, and full work history (title, company, date range, location per role). Results are returned as a JSON array.</p>
+                    <summary>遇到 CAPTCHA 驗證碼怎麼辦？</summary>
+                    <p>如果 LinkedIn 顯示驗證碼，您需要手動完成驗證。這通常發生在 LinkedIn 偵測到異常活動時。請等待數小時後再重試。</p>
                 </details>
 
                 <details class="faq-item">
-                    <summary>Can I filter profiles by company and country at the same time?</summary>
-                    <p>Yes — all filters (company, country, industry, keywords) can be combined. Only profiles matching all specified filters will be returned.</p>
+                    <summary>個人檔案爬取器會擷取哪些資料？</summary>
+                    <p>爬取器會擷取：全名、職業標題、所在地、目前公司、目前職稱、產業類別，以及完整工作經歷（每段經歷的職稱、公司、任職期間、地點）。結果以 JSON 陣列回傳。</p>
                 </details>
 
                 <details class="faq-item">
-                    <summary>Does the Profile Scraper work with free LinkedIn accounts?</summary>
-                    <p>Yes, but free accounts have limited search results (usually up to 100 people search results per month). LinkedIn Premium or Sales Navigator increases limits significantly.</p>
+                    <summary>可以同時依公司和國家篩選個人檔案嗎？</summary>
+                    <p>可以 — 所有篩選條件（公司、國家、產業、關鍵字）皆可組合使用。只有符合所有指定條件的個人檔案才會被回傳。</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>免費 LinkedIn 帳號也可以使用個人檔案爬取器嗎？</summary>
+                    <p>可以，但免費帳號的人才搜尋結果有限（通常每月最多 100 筆）。LinkedIn 高級會員或 Sales Navigator 可大幅提升搜尋上限。</p>
                 </details>
             </div>
         </div>
@@ -405,8 +429,8 @@
     <section class="cta">
         <div class="container">
             <div class="cta-content">
-                <h2>Ready to Supercharge Your LinkedIn?</h2>
-                <p>Auto-apply to jobs and scrape profiles — all from your AI assistant with one command.</p>
+                <h2>準備好強化你的 LinkedIn 了嗎？</h2>
+                <p>只需一個指令，即可自動投遞職缺、爬取個人檔案 — 全程由 AI 助理操作。</p>
                 <div class="cta-buttons">
                     <a href="https://github.com/yennanliu/linkedin-skill" class="btn-primary-white" target="_blank">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -414,10 +438,10 @@
                             <polyline points="7 10 12 15 17 10"/>
                             <line x1="12" y1="15" x2="12" y2="3"/>
                         </svg>
-                        Get Started Free
+                        免費開始使用
                     </a>
                     <a href="https://github.com/yennanliu/linkedin-skill/blob/main/QUICKSTART.md" class="btn-secondary-white" target="_blank">
-                        Read Documentation
+                        閱讀技術文件
                     </a>
                 </div>
             </div>
@@ -435,36 +459,37 @@
                             <path d="M10 13H14V24H10V13ZM12 8C13.1 8 14 8.9 14 10C14 11.1 13.1 12 12 12C10.9 12 10 11.1 10 10C10 8.9 10.9 8 12 8Z" fill="white"/>
                             <path d="M16 13H20V15H20.1C20.6 14.1 21.9 13 23.8 13C27.7 13 28 15.5 28 18.4V24H24V19.2C24 17.4 24 15.1 21.5 15.1C19 15.1 18.6 17.1 18.6 19.1V24H14.6V13H16Z" fill="white"/>
                         </svg>
-                        <span>LinkedIn Skills</span>
+                        <span>LinkedIn 技能套件</span>
                     </div>
                     <p class="footer-description">
-                        AI-powered LinkedIn automation: Easy Apply &amp; Profile Scraper for Claude Code and Gemini CLI
+                        AI 驅動的 LinkedIn 自動化工具：Easy Apply 投遞 &amp; 個人檔案爬取，支援 Claude Code 與 Gemini CLI
                     </p>
                 </div>
                 <div class="footer-links">
                     <div class="footer-column">
-                        <h4>Documentation</h4>
-                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/QUICKSTART.md" target="_blank">Quick Start</a>
-                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/INSTALLATION.md" target="_blank">Installation</a>
-                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/PROFILE_SCRAPER.md" target="_blank">Profile Scraper Guide</a>
-                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/USAGE_EXAMPLES.md" target="_blank">Examples</a>
+                        <h4>技術文件</h4>
+                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/QUICKSTART.md" target="_blank">快速開始</a>
+                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/INSTALLATION.md" target="_blank">安裝指南</a>
+                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/PROFILE_SCRAPER.md" target="_blank">個人檔案爬取指南</a>
+                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/USAGE_EXAMPLES.md" target="_blank">使用範例</a>
                     </div>
                     <div class="footer-column">
-                        <h4>Resources</h4>
+                        <h4>資源</h4>
                         <a href="https://github.com/yennanliu/linkedin-skill" target="_blank">GitHub</a>
-                        <a href="https://github.com/yennanliu/linkedin-skill/issues" target="_blank">Report Issue</a>
-                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/CHANGELOG.md" target="_blank">Changelog</a>
+                        <a href="https://github.com/yennanliu/linkedin-skill/issues" target="_blank">回報問題</a>
+                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/CHANGELOG.md" target="_blank">更新日誌</a>
                     </div>
                     <div class="footer-column">
-                        <h4>Community</h4>
-                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/CONTRIBUTING.md" target="_blank">Contributing</a>
+                        <h4>社群</h4>
+                        <a href="https://github.com/yennanliu/linkedin-skill/blob/main/CONTRIBUTING.md" target="_blank">貢獻指南</a>
                         <a href="https://github.com/yennanliu/104Skill" target="_blank">104Skill</a>
+                        <a href="index.html">English</a>
                     </div>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 LinkedIn Skills. Open source under MIT License.</p>
-                <p>Made with ❤️ for job seekers worldwide</p>
+                <p>&copy; 2026 LinkedIn 技能套件。依 MIT 授權條款開放原始碼。</p>
+                <p>以 ❤️ 為全球求職者打造</p>
             </div>
         </div>
     </footer>

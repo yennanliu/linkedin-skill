@@ -4,7 +4,7 @@ Two Claude Code skills for LinkedIn automation using Playwright MCP tools.
 
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/yennanliu/linkedin-skill)
 
-🌐 **[Visit Repository](https://github.com/yennanliu/linkedin-skill)** | 📚 **[Documentation](https://github.com/yennanliu/linkedin-skill/blob/main/QUICKSTART.md)** | 🚀 **[Quick Start](https://github.com/yennanliu/linkedin-skill/blob/main/QUICKSTART.md)**
+🌐 **[繁體中文 README](README_zh-TW.md)** | 🌐 **[Visit Repository](https://github.com/yennanliu/linkedin-skill)** | 📚 **[Documentation](https://github.com/yennanliu/linkedin-skill/blob/main/QUICKSTART.md)** | 🚀 **[Quick Start](https://github.com/yennanliu/linkedin-skill/blob/main/QUICKSTART.md)**
 
 ---
 
