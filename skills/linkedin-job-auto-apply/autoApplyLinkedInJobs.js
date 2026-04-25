@@ -1,13 +1,10 @@
 /**
  * LinkedIn Job Auto-Apply Automation Script
  *
- * Features:
- * - Target-based execution (stops after N successful applications)
- * - Keyboard controls: P=Pause, R=Resume, Q=Quit
- * - On-page status indicator
- * - Easy Apply automation
- * - Human-like delays
- * - Comprehensive error handling
+ * Applies ONLY to Easy Apply jobs.
+ * When a questionnaire/form step is encountered, fills fields with
+ * sensible default values (text inputs, number inputs, dropdowns,
+ * radio buttons) and continues — never skips due to forms.
  *
  * Usage:
  * ```javascript
@@ -17,7 +14,8 @@
  *   maxPages: 20,
  *   searchKeywords: 'software engineer',
  *   location: 'United States',
- *   easyApplyOnly: true
+ *   delayMin: 2000,
+ *   delayMax: 4000
  * });
  * ```
  */
@@ -29,7 +27,6 @@ async function autoApplyLinkedInJobs(page, options = {}) {
     maxPages = 20,
     searchKeywords = 'software engineer',
     location = 'United States',
-    easyApplyOnly = true,
     delayMin = 2000,
     delayMax = 4000
   } = options;
@@ -49,17 +46,12 @@ async function autoApplyLinkedInJobs(page, options = {}) {
 
   // ── Setup Keyboard Controls ────────────────────────────────────────────
   await page.evaluate(() => {
-    window.linkedinAutoApplyState = {
-      isPaused: false,
-      shouldQuit: false
-    };
+    window.linkedinAutoApplyState = { isPaused: false, shouldQuit: false };
 
-    // Remove existing listener if any
     if (window.linkedinKeyboardHandler) {
       document.removeEventListener('keydown', window.linkedinKeyboardHandler);
     }
 
-    // Add keyboard event listener
     window.linkedinKeyboardHandler = (e) => {
       if (e.key === 'p' || e.key === 'P') {
         window.linkedinAutoApplyState.isPaused = true;
@@ -78,11 +70,9 @@ async function autoApplyLinkedInJobs(page, options = {}) {
 
   // ── Setup Status Indicator ─────────────────────────────────────────────
   await page.evaluate(() => {
-    // Remove existing indicator if any
     const existing = document.getElementById('linkedin-auto-apply-status');
     if (existing) existing.remove();
 
-    // Create status indicator
     const statusDiv = document.createElement('div');
     statusDiv.id = 'linkedin-auto-apply-status';
     statusDiv.style.cssText = `
@@ -103,14 +93,11 @@ async function autoApplyLinkedInJobs(page, options = {}) {
     statusDiv.innerHTML = `
       <div style="font-size: 16px; margin-bottom: 8px;">LinkedIn Auto-Apply</div>
       <div id="linkedin-status-text">Starting...</div>
-      <div style="margin-top: 8px; font-size: 12px; opacity: 0.9;">
-        P=Pause | R=Resume | Q=Quit
-      </div>
+      <div style="margin-top: 8px; font-size: 12px; opacity: 0.9;">P=Pause | R=Resume | Q=Quit</div>
     `;
     document.body.appendChild(statusDiv);
   });
 
-  // Helper: Update status indicator
   async function updateStatus(text, color = '#0a66c2') {
     await page.evaluate(({ text, color }) => {
       const statusDiv = document.getElementById('linkedin-auto-apply-status');
@@ -122,13 +109,11 @@ async function autoApplyLinkedInJobs(page, options = {}) {
     }, { text, color });
   }
 
-  // Helper: Check keyboard state
   async function checkKeyboardState() {
     const state = await page.evaluate(() => window.linkedinAutoApplyState);
     isPaused = state.isPaused;
     shouldQuit = state.shouldQuit;
 
-    // Wait while paused
     while (isPaused && !shouldQuit) {
       await updateStatus('⏸️ PAUSED', '#ff9500');
       await page.waitForTimeout(1000);
@@ -140,243 +125,295 @@ async function autoApplyLinkedInJobs(page, options = {}) {
     return shouldQuit;
   }
 
-  // Helper: Apply to a single job
+  // ── Fill form fields with sensible defaults ────────────────────────────
+  // Runs on every modal step before attempting Next/Submit.
+  // Handles: text inputs, number inputs, native <select>, radio groups.
+  async function fillFormDefaults() {
+    await page.evaluate(() => {
+      const modal = document.querySelector('[role="dialog"], .jobs-easy-apply-modal');
+      if (!modal) return;
+
+      function getLabel(el) {
+        const ariaLabel = el.getAttribute('aria-label') || '';
+        const labelEl = el.id ? document.querySelector(`label[for="${el.id}"]`) : null;
+        return (ariaLabel + ' ' + (labelEl ? labelEl.textContent : '')).toLowerCase();
+      }
+
+      function dispatch(el) {
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+
+      // Text / email / tel inputs
+      modal.querySelectorAll(
+        'input[type="text"], input[type="email"], input[type="tel"], input:not([type])'
+      ).forEach(input => {
+        if (input.value.trim()) return; // already filled
+        const label = getLabel(input);
+        if (label.includes('phone') || label.includes('tel') || label.includes('mobile')) {
+          input.value = '0000000000';
+        } else if (label.includes('linkedin') || label.includes('url') || label.includes('website')) {
+          input.value = 'https://www.linkedin.com/in/me';
+        } else if (label.includes('city') || label.includes('address')) {
+          input.value = 'Remote';
+        } else if (label.includes('zip') || label.includes('postal')) {
+          input.value = '00000';
+        } else {
+          input.value = 'N/A';
+        }
+        dispatch(input);
+      });
+
+      // Number inputs
+      modal.querySelectorAll('input[type="number"]').forEach(input => {
+        if (input.value.trim()) return;
+        const label = getLabel(input);
+        if (label.includes('year') || label.includes('experience') || label.includes('exp')) {
+          input.value = '3';
+        } else if (label.includes('salary') || label.includes('rate') || label.includes('compensation')) {
+          input.value = '0';
+        } else {
+          input.value = '1';
+        }
+        dispatch(input);
+      });
+
+      // Native <select> dropdowns — pick first non-placeholder option
+      modal.querySelectorAll('select').forEach(select => {
+        if (select.value) return; // already has a value
+        const firstReal = Array.from(select.options).find(
+          o => o.value && o.value !== '' && !o.disabled
+        );
+        if (firstReal) {
+          select.value = firstReal.value;
+          dispatch(select);
+        }
+      });
+
+      // Radio button groups — click first option if none selected
+      const radioGroups = {};
+      modal.querySelectorAll('input[type="radio"]').forEach(radio => {
+        const key = radio.name || radio.getAttribute('aria-name') || radio.closest('fieldset')?.id || 'unnamed';
+        if (!radioGroups[key]) radioGroups[key] = [];
+        radioGroups[key].push(radio);
+      });
+      Object.values(radioGroups).forEach(group => {
+        if (group.some(r => r.checked)) return;
+        const first = group[0];
+        first.checked = true;
+        first.dispatchEvent(new Event('click', { bubbles: true }));
+        dispatch(first);
+      });
+
+      // Textareas — leave empty unless required (LinkedIn usually pre-fills from profile)
+      modal.querySelectorAll('textarea').forEach(ta => {
+        if (ta.value.trim()) return;
+        if (ta.required || ta.getAttribute('aria-required') === 'true') {
+          ta.value = 'Please see my LinkedIn profile and resume for details.';
+          dispatch(ta);
+        }
+      });
+    });
+
+    // Small pause so React re-renders after field changes
+    await page.waitForTimeout(500);
+  }
+
+  // ── Close modal helper ─────────────────────────────────────────────────
+  async function closeModal() {
+    await page.evaluate(() => {
+      const btn = document.querySelector(
+        'button[aria-label*="Dismiss"], button[data-test-modal-close-btn]'
+      );
+      if (btn) btn.click();
+    });
+    await page.waitForTimeout(1000);
+  }
+
+  // ── Apply to a single job ──────────────────────────────────────────────
   async function applyToJob(job, jobIndex) {
     console.log(`\n🔍 [${stats.totalProcessed + 1}] Processing: ${job.title}`);
     console.log(`   Company: ${job.company}`);
     console.log(`   Location: ${job.location}`);
 
-    let result;
     try {
-      // Check if already applied
       if (job.alreadyApplied) {
         console.log('   ⚠️  SKIPPED: Already applied');
-        result = { status: 'skipped', reason: 'Already applied', job };
         stats.skipped++;
-        return result;
+        return { status: 'skipped', reason: 'Already applied', job };
       }
 
-      // Check if has Easy Apply
-      if (easyApplyOnly && !job.hasEasyApply) {
+      if (!job.hasEasyApply) {
         console.log('   ⚠️  SKIPPED: Not an Easy Apply job');
-        result = { status: 'skipped', reason: 'Not Easy Apply', job };
         stats.skipped++;
-        return result;
+        return { status: 'skipped', reason: 'Not Easy Apply', job };
       }
 
-      // Click Easy Apply button
-      const easyApplyClicked = await page.evaluate((index) => {
-        const jobCards = document.querySelectorAll('.job-card-container, .jobs-search-results__list-item');
-        const card = jobCards[index];
+      // Click the Easy Apply button on the job card
+      const clicked = await page.evaluate((index) => {
+        const cards = document.querySelectorAll('.job-card-container, .jobs-search-results__list-item');
+        const card = cards[index];
         if (!card) return false;
-
-        const easyApplyButton = card.querySelector('button[aria-label*="Easy Apply"], button:has-text("Easy Apply")');
-        if (easyApplyButton) {
-          easyApplyButton.click();
-          return true;
-        }
+        const btn = card.querySelector('button[aria-label*="Easy Apply"]');
+        if (btn) { btn.click(); return true; }
         return false;
       }, jobIndex);
 
-      if (!easyApplyClicked) {
-        console.log('   ⚠️  SKIPPED: Easy Apply button not found');
-        result = { status: 'skipped', reason: 'No Easy Apply button', job };
-        stats.skipped++;
-        return result;
+      if (!clicked) {
+        // Try clicking the card first so the detail pane loads, then find the button there
+        await page.evaluate((index) => {
+          const cards = document.querySelectorAll('.job-card-container, .jobs-search-results__list-item');
+          if (cards[index]) cards[index].click();
+        }, jobIndex);
+        await page.waitForTimeout(2000);
+
+        const clickedDetailPane = await page.evaluate(() => {
+          const btn = document.querySelector(
+            '.jobs-apply-button--top-card button[aria-label*="Easy Apply"], ' +
+            '.jobs-s-apply button[aria-label*="Easy Apply"]'
+          );
+          if (btn) { btn.click(); return true; }
+          return false;
+        });
+
+        if (!clickedDetailPane) {
+          console.log('   ⚠️  SKIPPED: Easy Apply button not found');
+          stats.skipped++;
+          return { status: 'skipped', reason: 'No Easy Apply button', job };
+        }
       }
 
-      // Wait for Easy Apply modal
       await page.waitForTimeout(2000);
 
-      // Check if modal opened
-      const modalOpen = await page.evaluate(() => {
-        const modal = document.querySelector('[role="dialog"], .jobs-easy-apply-modal');
-        return !!modal;
-      });
+      const modalOpen = await page.evaluate(() =>
+        !!document.querySelector('[role="dialog"], .jobs-easy-apply-modal')
+      );
 
       if (!modalOpen) {
         console.log('   ⚠️  SKIPPED: Easy Apply modal did not open');
-        result = { status: 'skipped', reason: 'Modal did not open', job };
         stats.skipped++;
-        return result;
+        return { status: 'skipped', reason: 'Modal did not open', job };
       }
 
-      // Handle Easy Apply modal (single-step or multi-step)
-      let currentStep = 0;
-      const maxSteps = 5;
+      // ── Step loop — fill defaults then advance ─────────────────────────
+      const maxSteps = 10;
+      for (let step = 1; step <= maxSteps; step++) {
+        // Fill any empty form fields before checking buttons
+        await fillFormDefaults();
 
-      while (currentStep < maxSteps) {
-        currentStep++;
+        const hasSubmit = await page.evaluate(() =>
+          !!Array.from(document.querySelectorAll('button')).find(b =>
+            b.textContent.includes('Submit application') ||
+            b.textContent.trim() === 'Submit' ||
+            b.getAttribute('aria-label')?.includes('Submit')
+          )
+        );
 
-        // Check for Submit button (final step)
-        const hasSubmitButton = await page.evaluate(() => {
-          const submitButton = Array.from(document.querySelectorAll('button'))
-            .find(btn => btn.textContent.includes('Submit application') ||
-                         btn.textContent.trim() === 'Submit' ||
-                         btn.getAttribute('aria-label')?.includes('Submit'));
-          return !!submitButton;
-        });
-
-        if (hasSubmitButton) {
-          // Click Submit
+        if (hasSubmit) {
           await page.evaluate(() => {
-            const submitButton = Array.from(document.querySelectorAll('button'))
-              .find(btn => btn.textContent.includes('Submit application') ||
-                           btn.textContent.trim() === 'Submit' ||
-                           btn.getAttribute('aria-label')?.includes('Submit'));
-            if (submitButton) submitButton.click();
+            const btn = Array.from(document.querySelectorAll('button')).find(b =>
+              b.textContent.includes('Submit application') ||
+              b.textContent.trim() === 'Submit' ||
+              b.getAttribute('aria-label')?.includes('Submit')
+            );
+            if (btn) btn.click();
           });
 
           await page.waitForTimeout(2500);
 
-          // Verify success
           const success = await page.evaluate(() => {
-            const successText = document.body.textContent;
-            return successText.includes('Application sent') ||
-                   successText.includes('Your application was sent') ||
-                   successText.includes('Application submitted');
+            const t = document.body.textContent;
+            return t.includes('Application sent') ||
+                   t.includes('Your application was sent') ||
+                   t.includes('Application submitted');
           });
 
-          // Close modal
-          await page.evaluate(() => {
-            const closeButton = document.querySelector('button[aria-label*="Dismiss"], button[data-test-modal-close-btn]');
-            if (closeButton) closeButton.click();
-          });
-          await page.waitForTimeout(1000);
+          await closeModal();
 
           if (success) {
             console.log('   ✅ SUCCESS: Application submitted');
-            result = { status: 'success', job };
             stats.successful++;
-            return result;
+            return { status: 'success', job };
           } else {
             console.log('   ❌ FAILED: Submission not confirmed');
-            result = { status: 'failed', reason: 'Submission not confirmed', job };
             stats.failed++;
-            return result;
+            return { status: 'failed', reason: 'Submission not confirmed', job };
           }
         }
 
-        // Check for Next button (multi-step)
-        const hasNextButton = await page.evaluate(() => {
-          const nextButton = Array.from(document.querySelectorAll('button'))
-            .find(btn => btn.textContent.trim() === 'Next' ||
-                         btn.textContent.includes('Continue') ||
-                         btn.getAttribute('aria-label')?.includes('next step'));
-          return !!nextButton;
-        });
+        const hasNext = await page.evaluate(() =>
+          !!Array.from(document.querySelectorAll('button')).find(b =>
+            b.textContent.trim() === 'Next' ||
+            b.textContent.includes('Continue') ||
+            b.getAttribute('aria-label')?.includes('next step')
+          )
+        );
 
-        if (hasNextButton) {
-          // Click Next
+        if (hasNext) {
           await page.evaluate(() => {
-            const nextButton = Array.from(document.querySelectorAll('button'))
-              .find(btn => btn.textContent.trim() === 'Next' ||
-                           btn.textContent.includes('Continue') ||
-                           btn.getAttribute('aria-label')?.includes('next step'));
-            if (nextButton) nextButton.click();
+            const btn = Array.from(document.querySelectorAll('button')).find(b =>
+              b.textContent.trim() === 'Next' ||
+              b.textContent.includes('Continue') ||
+              b.getAttribute('aria-label')?.includes('next step')
+            );
+            if (btn) btn.click();
           });
-
           await page.waitForTimeout(1500);
           continue;
         }
 
-        // Neither Submit nor Next found - requires additional info
-        console.log(`   ⚠️  SKIPPED: Requires additional information (step ${currentStep})`);
-
-        // Close modal
-        await page.evaluate(() => {
-          const closeButton = document.querySelector('button[aria-label*="Dismiss"], button[data-test-modal-close-btn]');
-          if (closeButton) closeButton.click();
-        });
-        await page.waitForTimeout(1000);
-
-        result = { status: 'skipped', reason: 'Requires additional information', job };
-        stats.skipped++;
-        return result;
+        // No Submit or Next — truly unhandled state; bail
+        console.log(`   ❌ FAILED: No actionable button found at step ${step}`);
+        await closeModal();
+        stats.failed++;
+        return { status: 'failed', reason: `No button at step ${step}`, job };
       }
 
       // Exceeded max steps
-      console.log('   ❌ FAILED: Too many steps');
-
-      // Close modal
-      await page.evaluate(() => {
-        const closeButton = document.querySelector('button[aria-label*="Dismiss"], button[data-test-modal-close-btn]');
-        if (closeButton) closeButton.click();
-      });
-      await page.waitForTimeout(1000);
-
-      result = { status: 'failed', reason: 'Too many steps', job };
+      console.log('   ❌ FAILED: Exceeded max steps');
+      await closeModal();
       stats.failed++;
-      return result;
+      return { status: 'failed', reason: 'Exceeded max steps', job };
 
     } catch (error) {
       console.log(`   ❌ ERROR: ${error.message}`);
-
-      // Try to close modal
-      try {
-        await page.evaluate(() => {
-          const closeButton = document.querySelector('button[aria-label*="Dismiss"], button[data-test-modal-close-btn]');
-          if (closeButton) closeButton.click();
-        });
-        await page.waitForTimeout(1000);
-      } catch (e) {
-        // Ignore cleanup errors
-      }
-
-      result = { status: 'error', reason: error.message, job };
+      try { await closeModal(); } catch (e) { /* ignore */ }
       stats.failed++;
-      return result;
+      return { status: 'error', reason: error.message, job };
     }
   }
 
-  // Helper: Collect jobs from current page
+  // ── Collect jobs from current page ────────────────────────────────────
   async function collectJobsFromPage() {
-    const jobs = await page.evaluate(() => {
-      const jobCards = document.querySelectorAll('.job-card-container, .jobs-search-results__list-item');
-      const jobList = [];
+    return page.evaluate(() => {
+      const cards = document.querySelectorAll('.job-card-container, .jobs-search-results__list-item');
+      return Array.from(cards).map((card, index) => {
+        const titleEl = card.querySelector('.job-card-list__title, .job-card-container__link');
+        const companyEl = card.querySelector('.job-card-container__company-name, .job-card-container__primary-description');
+        const locationEl = card.querySelector('.job-card-container__metadata-item, [class*="location"]');
+        const footerEl = card.querySelector('[class*="applied"], .job-card-container__footer-item');
+        const footerText = footerEl ? footerEl.textContent : '';
 
-      jobCards.forEach((card, index) => {
-        const titleElement = card.querySelector('.job-card-list__title, .job-card-container__link');
-        const title = titleElement ? titleElement.textContent.trim() : 'Unknown';
-
-        const companyElement = card.querySelector('.job-card-container__company-name, .job-card-container__primary-description');
-        const company = companyElement ? companyElement.textContent.trim() : 'Unknown';
-
-        const locationElement = card.querySelector('.job-card-container__metadata-item, [class*="location"]');
-        const location = locationElement ? locationElement.textContent.trim() : 'Unknown';
-
-        const easyApplyButton = card.querySelector('button[aria-label*="Easy Apply"], button:has-text("Easy Apply")');
-        const hasEasyApply = !!easyApplyButton;
-
-        const appliedIndicator = card.querySelector('[class*="applied"], .job-card-container__footer-item');
-        const appliedText = appliedIndicator ? appliedIndicator.textContent : '';
-        const alreadyApplied = appliedText.includes('Applied') || appliedText.includes('applied');
-
-        jobList.push({
+        return {
           index,
-          title: title.substring(0, 80),
-          company: company.substring(0, 50),
-          location: location.substring(0, 50),
-          hasEasyApply,
-          alreadyApplied
-        });
+          title: (titleEl?.textContent?.trim() || 'Unknown').substring(0, 80),
+          company: (companyEl?.textContent?.trim() || 'Unknown').substring(0, 50),
+          location: (locationEl?.textContent?.trim() || 'Unknown').substring(0, 50),
+          hasEasyApply: !!card.querySelector('button[aria-label*="Easy Apply"]'),
+          alreadyApplied: footerText.includes('Applied') || footerText.includes('applied')
+        };
       });
-
-      return jobList;
     });
-
-    return jobs;
   }
 
-  // ── Main Automation Loop ───────────────────────────────────────────────
+  // ── Main loop ──────────────────────────────────────────────────────────
   console.log('\n' + '='.repeat(70));
-  console.log('🚀 LinkedIn Auto-Apply Automation');
+  console.log('🚀 LinkedIn Auto-Apply (Easy Apply only)');
   console.log(`   Target Applications: ${targetApplications}`);
   console.log(`   Start Page         : ${startPage}`);
   console.log(`   Max Pages          : ${maxPages}`);
   console.log(`   Search Keywords    : ${searchKeywords}`);
   console.log(`   Location           : ${location}`);
-  console.log(`   Easy Apply Only    : ${easyApplyOnly}`);
   console.log('   Controls           : P=Pause | R=Resume | Q=Quit');
   console.log('='.repeat(70) + '\n');
 
@@ -384,27 +421,24 @@ async function autoApplyLinkedInJobs(page, options = {}) {
   let currentPage = startPage;
   const endPage = startPage + maxPages - 1;
 
-  // Build search URL
-  const baseUrl = 'https://www.linkedin.com/jobs/search/';
+  // Always enable the Easy Apply filter (f_AL=true)
   const params = new URLSearchParams({
     keywords: searchKeywords,
     location: location,
-    ...(easyApplyOnly && { f_AL: 'true' })
+    f_AL: 'true'
   });
+  const baseUrl = 'https://www.linkedin.com/jobs/search/';
 
   while (currentPage <= endPage && stats.successful < targetApplications && !shouldQuit) {
-    // Check for quit/pause
     if (await checkKeyboardState()) break;
 
     console.log(`\n📄 [Page ${currentPage}]`);
     await updateStatus(`Page ${currentPage} | Apps: ${stats.successful}/${targetApplications}`, '#0a66c2');
 
-    // Navigate to page
     const pageUrl = `${baseUrl}?${params.toString()}&start=${(currentPage - 1) * 25}`;
     await page.goto(pageUrl, { waitUntil: 'networkidle', timeout: 30000 });
     await page.waitForTimeout(3000);
 
-    // Collect jobs
     const jobs = await collectJobsFromPage();
     console.log(`   Found ${jobs.length} jobs on this page`);
 
@@ -413,36 +447,23 @@ async function autoApplyLinkedInJobs(page, options = {}) {
       break;
     }
 
-    const pageStats = {
-      pageNumber: currentPage,
-      successful: 0,
-      failed: 0,
-      skipped: 0
-    };
+    const pageStats = { pageNumber: currentPage, successful: 0, failed: 0, skipped: 0 };
 
-    // Process jobs
     for (let i = 0; i < jobs.length && stats.successful < targetApplications && !shouldQuit; i++) {
-      // Check for quit/pause
       if (await checkKeyboardState()) break;
 
-      const job = jobs[i];
-
-      // Update status
       await updateStatus(
         `Page ${currentPage} | Job ${i + 1}/${jobs.length}\nApps: ${stats.successful}/${targetApplications}`,
         '#0a66c2'
       );
 
-      // Apply to job
-      const result = await applyToJob(job, i);
+      const result = await applyToJob(jobs[i], i);
       stats.totalProcessed++;
 
       if (result.status === 'success') {
         pageStats.successful++;
-
-        // Check if reached target
         if (stats.successful >= targetApplications) {
-          console.log(`\n🎯 Target reached! ${stats.successful} successful applications`);
+          console.log(`\n🎯 Target reached! ${stats.successful} applications submitted.`);
           break;
         }
       } else if (result.status === 'skipped') {
@@ -451,21 +472,22 @@ async function autoApplyLinkedInJobs(page, options = {}) {
         pageStats.failed++;
       }
 
-      // Human-like delay between jobs
       const delay = delayMin + Math.random() * (delayMax - delayMin);
-      console.log(`   ⏱️  Waiting ${(delay / 1000).toFixed(1)}s before next job...`);
+      console.log(`   ⏱️  Waiting ${(delay / 1000).toFixed(1)}s...`);
       await page.waitForTimeout(delay);
     }
 
     stats.pages.push(pageStats);
-    console.log(`   Page ${currentPage} Summary: ${pageStats.successful} success, ${pageStats.failed} failed, ${pageStats.skipped} skipped`);
+    console.log(
+      `   Page ${currentPage} summary: ` +
+      `${pageStats.successful} success, ${pageStats.failed} failed, ${pageStats.skipped} skipped`
+    );
 
     currentPage++;
   }
 
-  // ── Final Summary ──────────────────────────────────────────────────────
-  const runEnd = Date.now();
-  const durationSec = ((runEnd - runStart) / 1000).toFixed(1);
+  // ── Final summary ──────────────────────────────────────────────────────
+  const durationSec = ((Date.now() - runStart) / 1000).toFixed(1);
 
   console.log('\n' + '='.repeat(70));
   console.log('📊 Final Summary');
@@ -478,13 +500,11 @@ async function autoApplyLinkedInJobs(page, options = {}) {
   console.log(`   🎯 Target Reached      : ${stats.successful >= targetApplications ? 'YES' : 'NO'}`);
   console.log('='.repeat(70) + '\n');
 
-  // Update final status
   await updateStatus(
     `✅ Complete: ${stats.successful}/${targetApplications} applications`,
     '#057642'
   );
 
-  // Cleanup keyboard listener
   await page.evaluate(() => {
     if (window.linkedinKeyboardHandler) {
       document.removeEventListener('keydown', window.linkedinKeyboardHandler);
@@ -495,7 +515,6 @@ async function autoApplyLinkedInJobs(page, options = {}) {
   return stats;
 }
 
-// Export function (if using module system)
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { autoApplyLinkedInJobs };
 }
