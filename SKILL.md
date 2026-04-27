@@ -50,6 +50,29 @@ console.log(JSON.stringify(results, null, 2));
 
 ---
 
+## Specialized Agents
+
+Both skills are backed by three specialist agents for deeper control:
+
+| Agent | Skill Name | Purpose |
+|-------|-----------|---------|
+| **Automation Agent** | `linkedin-automation-agent` | Timing, retry logic, rate limiting, anti-detection patterns |
+| **Web Structure Agent** | `linkedin-web-structure-agent` | LinkedIn DOM selectors, lazy loading, resilient element targeting |
+| **QA Agent** | `linkedin-qa-agent` | Pre-flight checks, result verification, data quality reports |
+
+Full agent docs: [`skills/agents/`](./skills/agents/)
+
+**Typical run flow:**
+```
+1. QA Agent      → preFlightCheck(page)       # before starting
+2. [run skill]
+3. QA Agent      → verify / generateReport()  # after finishing
+   ↓ if selectors broken → Web Structure Agent
+   ↓ if high failure rate → Automation Agent
+```
+
+---
+
 ## Installation
 
 ```bash

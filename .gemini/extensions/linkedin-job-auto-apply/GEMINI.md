@@ -1,6 +1,21 @@
 # LinkedIn Skills
 
-Two LinkedIn automation skills using Playwright browser tools.
+Two LinkedIn automation skills using Playwright browser tools, backed by three specialist agents.
+
+---
+
+## Specialized Agents
+
+| Agent | File | When to Use |
+|-------|------|-------------|
+| **Automation Agent** | `skills/agents/automation-agent/SKILL.md` | Timing, retry logic, rate limiting, anti-detection |
+| **Web Structure Agent** | `skills/agents/web-structure-agent/SKILL.md` | Broken selectors, LinkedIn DOM changes, lazy loading |
+| **QA Agent** | `skills/agents/qa-agent/SKILL.md` | Pre-flight checks, verify results, data quality reports |
+
+**Recommended run order:**
+1. QA Agent: `preFlightCheck(page)` — confirm session is healthy
+2. Run the automation skill
+3. QA Agent: verify results and generate report
 
 ---
 

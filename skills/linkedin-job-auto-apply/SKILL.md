@@ -7,6 +7,30 @@ description: Automate job applications on LinkedIn using Playwright MCP tools. F
 
 This skill enables automated job applications on LinkedIn using Playwright MCP browser automation tools with intelligent target-based execution and real-time keyboard controls.
 
+## Specialized Agents
+
+This skill is backed by three specialist agents. Invoke them for deeper help:
+
+| Agent | File | When to Use |
+|-------|------|-------------|
+| **Automation Agent** | [`skills/agents/automation-agent/SKILL.md`](../agents/automation-agent/SKILL.md) | Timing, retry logic, rate limiting, anti-detection |
+| **Web Structure Agent** | [`skills/agents/web-structure-agent/SKILL.md`](../agents/web-structure-agent/SKILL.md) | Broken selectors, LinkedIn DOM changes, lazy loading |
+| **QA Agent** | [`skills/agents/qa-agent/SKILL.md`](../agents/qa-agent/SKILL.md) | Verify submissions, validate results, session reports |
+
+### Recommended Run Order
+
+```
+1. QA Agent      → preFlightCheck(page)          # verify session is healthy
+2. [run automation]
+3. QA Agent      → verifyApplicationSuccess()    # after each submit
+4. QA Agent      → generateReport()              # end-of-session summary
+```
+
+If issues arise mid-run:
+- Selectors return 0 results → invoke **Web Structure Agent**
+- High failure rate / detected → invoke **Automation Agent**
+- Unsure if applications went through → invoke **QA Agent**
+
 ## When to Use This Skill
 
 Use this skill when:

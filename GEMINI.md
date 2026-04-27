@@ -1,6 +1,27 @@
 # LinkedIn Skills for Gemini CLI
 
-Two skills for LinkedIn automation using Playwright browser tools.
+Two skills for LinkedIn automation using Playwright browser tools, backed by three specialized agents.
+
+---
+
+## Specialized Agents
+
+Three agents support both skills. Load them when you need deeper expertise:
+
+| Agent | File | Purpose |
+|-------|------|---------|
+| **Automation Agent** | `skills/agents/automation-agent/SKILL.md` | Timing, retry logic, rate limiting, anti-detection patterns |
+| **Web Structure Agent** | `skills/agents/web-structure-agent/SKILL.md` | LinkedIn DOM selectors, lazy loading, virtual scroll, resilient targeting |
+| **QA Agent** | `skills/agents/qa-agent/SKILL.md` | Pre-flight checks, result verification, data validation, session reports |
+
+### When to Use Each Agent
+
+```
+Before each session:  QA Agent → preFlightCheck(page)
+Selector broken:      Web Structure Agent → provide fallback selectors
+High failure rate:    Automation Agent → review timing & retry logic
+After session:        QA Agent → validateBatchResults() / generateReport()
+```
 
 ---
 
