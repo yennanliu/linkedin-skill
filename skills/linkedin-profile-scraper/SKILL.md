@@ -17,19 +17,30 @@ This skill is backed by three specialist agents. Invoke them for deeper help:
 | **Web Structure Agent** | [`skills/agents/web-structure-agent/SKILL.md`](../agents/web-structure-agent/SKILL.md) | Broken selectors, missing fields, lazy load fixes |
 | **QA Agent** | [`skills/agents/qa-agent/SKILL.md`](../agents/qa-agent/SKILL.md) | Validate scraped data, completeness reports |
 
-### Recommended Run Order
+### Orchestrated Run Order
 
 ```
-1. QA Agent          → preFlightCheck(page)         # verify session is healthy
+1. QA Agent      → preFlightCheck(page)          # must PASS — abort if it fails
 2. [run batch scrape]
-3. QA Agent          → validateBatchResults()        # check data quality
-4. QA Agent          → generateReport()              # structured summary
+3. QA Agent      → validateBatchResults()         # completeness scoring
+4. QA Agent      → generateReport()              # PASS/WARN/FAIL summary
 ```
 
-If issues arise:
-- Fields returning null / empty → invoke **Web Structure Agent** for selector updates
-- Scraper getting rate-limited → invoke **Automation Agent** for back-off strategy
-- Low completeness scores → invoke **QA Agent** to identify which fields need fixing
+Escalation:
+- Fields returning null / empty → **Web Structure Agent** (selector updates + lazy-load fix)
+- Getting rate-limited → **Automation Agent** (back-off strategy)
+- Low completeness scores → **QA Agent** (identify which fields need fixing)
+
+### LinkedIn Search Filter Limitation
+
+The scraper builds a keyword query by joining company + country + industry as plain text. LinkedIn's people search does not parse this as structured filters — it treats everything as keywords.
+
+For structured filtering (e.g., company by URN, geo by URN), LinkedIn's search API requires internal IDs not exposed in the UI. The most reliable workaround is to:
+1. Navigate to LinkedIn People search manually, apply filters in the UI
+2. Copy the resulting URL (it will contain `facetCurrentCompany`, `facetGeoRegion`, etc.)
+3. Pass that URL directly to the scraper instead of building it from scratch
+
+Ask the **Web Structure Agent** for current URN lookup patterns if you need fully structured URL construction.
 
 ## Extracted Fields
 

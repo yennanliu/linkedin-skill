@@ -8,14 +8,16 @@ Two LinkedIn automation skills using Playwright browser tools, backed by three s
 
 | Agent | File | When to Use |
 |-------|------|-------------|
+| **Strategy Agent** | `skills/agents/strategy-agent/SKILL.md` | Filter jobs by relevance, blocklist, seniority, session budget |
 | **Automation Agent** | `skills/agents/automation-agent/SKILL.md` | Timing, retry logic, rate limiting, anti-detection |
 | **Web Structure Agent** | `skills/agents/web-structure-agent/SKILL.md` | Broken selectors, LinkedIn DOM changes, lazy loading |
 | **QA Agent** | `skills/agents/qa-agent/SKILL.md` | Pre-flight checks, verify results, data quality reports |
 
-**Recommended run order:**
-1. QA Agent: `preFlightCheck(page)` — confirm session is healthy
-2. Run the automation skill
-3. QA Agent: verify results and generate report
+**Orchestrated run order:**
+1. QA Agent: `preFlightCheck(page)` — must PASS before continuing
+2. Strategy Agent: `filterJobs(jobs, prefs)` — score and filter job list
+3. Run the automation skill
+4. QA Agent: verify results and generate report
 
 ---
 
