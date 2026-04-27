@@ -7,6 +7,30 @@ description: Scrape LinkedIn profile data (name, current company, country, work 
 
 Search LinkedIn people by **company**, **country**, and/or **industry**, then extract structured profile data for each result.
 
+## Specialized Agents
+
+This skill is backed by three specialist agents. Invoke them for deeper help:
+
+| Agent | File | When to Use |
+|-------|------|-------------|
+| **Automation Agent** | [`skills/agents/automation-agent/SKILL.md`](../agents/automation-agent/SKILL.md) | Timing strategy, retry logic, rate limiting |
+| **Web Structure Agent** | [`skills/agents/web-structure-agent/SKILL.md`](../agents/web-structure-agent/SKILL.md) | Broken selectors, missing fields, lazy load fixes |
+| **QA Agent** | [`skills/agents/qa-agent/SKILL.md`](../agents/qa-agent/SKILL.md) | Validate scraped data, completeness reports |
+
+### Recommended Run Order
+
+```
+1. QA Agent          → preFlightCheck(page)         # verify session is healthy
+2. [run batch scrape]
+3. QA Agent          → validateBatchResults()        # check data quality
+4. QA Agent          → generateReport()              # structured summary
+```
+
+If issues arise:
+- Fields returning null / empty → invoke **Web Structure Agent** for selector updates
+- Scraper getting rate-limited → invoke **Automation Agent** for back-off strategy
+- Low completeness scores → invoke **QA Agent** to identify which fields need fixing
+
 ## Extracted Fields
 
 | Field | Description |
