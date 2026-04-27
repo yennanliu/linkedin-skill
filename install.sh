@@ -116,37 +116,66 @@ JSON
 install_claude() {
   sep
   info "Installing skills for Claude Code..."
-  for skill in linkedin-job-auto-apply linkedin-profile-scraper; do
+  
+  # Core Skills
+  for skill in linkedin-job-auto-apply linkedin-profile-scraper linkedin-contact-reacher; do
     DEST="$HOME/.claude/skills/$skill"
     [ -d "$DEST" ] && { warn "Overwriting $DEST"; rm -rf "$DEST"; }
     mkdir -p "$DEST"
     cp -r "skills/$skill/"* "$DEST/"
     [ -f "$DEST/SKILL.md" ] && ok "$skill installed" || { err "Install failed: $skill"; return 1; }
   done
+
+  # Specialist Agents
+  for agent in automation-agent contact-discovery-agent email-generator-agent outreach-agent qa-agent strategy-agent web-structure-agent; do
+    DEST="$HOME/.claude/skills/linkedin-$agent"
+    [ -d "$DEST" ] && { warn "Overwriting $DEST"; rm -rf "$DEST"; }
+    mkdir -p "$DEST"
+    cp -r "skills/agents/$agent/"* "$DEST/"
+    [ -f "$DEST/SKILL.md" ] && ok "linkedin-$agent installed" || { err "Install failed: $agent"; return 1; }
+  done
+
   echo ""
   configure_playwright_claude
   echo ""
   info "Restart Claude Code for MCP changes to take effect"
-  info "Usage: claude → /linkedin-job-auto-apply  or  /linkedin-profile-scraper"
+  info "Usage: claude → /linkedin-job-auto-apply | /linkedin-profile-scraper | /linkedin-contact-reacher"
 }
 
 install_gemini() {
   sep
   info "Installing skills for Gemini CLI..."
-  DEST="$HOME/.gemini/extensions/linkedin-job-auto-apply"
+  DEST="$HOME/.gemini/extensions/linkedin-skill"
   mkdir -p "$DEST"
+  
+  # Extension config
   cp ".gemini/extensions/linkedin-job-auto-apply/gemini-extension.json" "$DEST/"
   cp ".gemini/extensions/linkedin-job-auto-apply/GEMINI.md"             "$DEST/"
+  
+  # Job Auto-Apply
   cp "skills/linkedin-job-auto-apply/autoApplyLinkedInJobs.js"          "$DEST/"
   cp "skills/linkedin-job-auto-apply/applySingleJob.js"                 "$DEST/"
+  
+  # Profile Scraper
   cp "skills/linkedin-profile-scraper/scrapeLinkedInProfiles.js"        "$DEST/"
   cp "skills/linkedin-profile-scraper/scrapeSingleProfile.js"           "$DEST/"
+
+  # Contact Reacher
+  cp "skills/linkedin-contact-reacher/discoverContacts.js"              "$DEST/"
+  cp "skills/linkedin-contact-reacher/extractContactInfo.js"            "$DEST/"
+  cp "skills/linkedin-contact-reacher/reachContacts.js"                 "$DEST/"
+  cp "skills/linkedin-contact-reacher/saveOutput.js"                    "$DEST/"
+
+  # Specialized Agents
+  mkdir -p "$DEST/skills/agents"
+  cp -r "skills/agents/"* "$DEST/skills/agents/"
+
   [ -f "$DEST/gemini-extension.json" ] && ok "Extension installed to $DEST" || { err "Gemini install failed"; return 1; }
   echo ""
   configure_playwright_gemini
   echo ""
   info "Restart Gemini CLI for MCP changes to take effect"
-  info "Usage: gemini → ask about LinkedIn job automation or profile scraping"
+  info "Usage: gemini → ask about LinkedIn job automation, profile scraping, or contact discovery"
 }
 
 install_copilot() {

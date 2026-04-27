@@ -1,6 +1,6 @@
 # GitHub Copilot Instructions — LinkedIn Automation Skills
 
-This repository contains two LinkedIn automation skills using Playwright browser automation.
+This repository contains three LinkedIn automation skills using Playwright browser automation.
 
 ---
 
@@ -55,10 +55,42 @@ console.log(JSON.stringify(results, null, 2));
 
 ---
 
+## Skill 3: Contact Reacher
+
+Discovers LinkedIn contacts for job referrals or networking using BFS/DFS traversal. Extracts URLs and generates email candidates.
+
+| File | Purpose |
+|------|---------|
+| `skills/linkedin-contact-reacher/discoverContacts.js` | BFS/DFS traversal from seed searches/profiles |
+| `skills/linkedin-contact-reacher/extractContactInfo.js` | Enrich contacts with email candidates |
+| `skills/linkedin-contact-reacher/reachContacts.js` | Send connection requests |
+| `skills/linkedin-contact-reacher/saveOutput.js` | Save results as JSON + CSV |
+
+**Usage:**
+```javascript
+// Paste discoverContacts.js, then:
+const contacts = await discoverContacts(page, {
+  seeds: [{ type: 'search', company: 'Google', role: 'Software Engineer' }],
+  strategy: 'bfs',
+  maxContacts: 30,
+});
+
+// Paste extractContactInfo.js, then:
+const enriched = await extractContactInfo(page, contacts, {
+  companyDomains: { 'Google': 'google.com' },
+});
+
+// Paste saveOutput.js, then:
+await saveOutput(enriched, { label: 'google-referrals' });
+```
+
+---
+
 ## How to Ask Copilot
 
 - "Help me scrape LinkedIn profiles at Stripe in Singapore"
 - "Apply to 20 LinkedIn software engineer jobs automatically"
+- "Discover 10 contacts at Google for a referral and generate emails"
 - "Show me how to use the LinkedIn profile scraper"
 
 Copilot will guide you to paste the appropriate JS into a Playwright code block and run it.

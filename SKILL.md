@@ -82,7 +82,7 @@ await saveOutput(enriched, { label: 'google-referrals', format: 'both' });
 
 ## Specialized Agents
 
-Both skills are backed by three specialist agents for deeper control:
+All three skills are backed by seven specialist agents for deeper control:
 
 | Agent | Skill Name | Purpose |
 |-------|-----------|---------|
