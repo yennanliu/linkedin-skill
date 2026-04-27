@@ -1,6 +1,6 @@
 {
   "name": "linkedin-job-auto-apply",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Automate job applications on LinkedIn using Playwright MCP tools. Supports Easy Apply jobs, single job applications, batch processing, and multi-page automation with controls.",
   "author": {
     "name": "jerryliu",
