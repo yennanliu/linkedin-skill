@@ -15,6 +15,27 @@
 | 自動投遞職缺 | `/linkedin-job-auto-apply` | 批次投遞 Easy Apply 職缺 |
 | 個人檔案爬取 | `/linkedin-profile-scraper` | 依公司／國家／產業爬取個人檔案 |
 
+## 專業代理人系統
+
+四個專業代理人在需要時提供更深入的支援：
+
+| 代理人 | 技能名稱 | 功能 |
+|--------|---------|------|
+| **策略代理人** | `linkedin-strategy-agent` | 依相關性、資歷、黑名單評分篩選職缺；規劃每日申請配額 |
+| **自動化代理人** | `linkedin-automation-agent` | 時間控制、重試邏輯、速率限制、防偵測模式 |
+| **網頁結構代理人** | `linkedin-web-structure-agent` | LinkedIn DOM 選擇器、延遲載入、虛擬捲動、穩健元素定位 |
+| **品質保證代理人** | `linkedin-qa-agent` | 啟動前檢查、結果驗證、資料品質報告 |
+
+**建議執行流程：**
+```
+1. 品質保證代理人   → preFlightCheck(page)        # 必須通過，否則中止
+2. 策略代理人       → filterJobs(jobs, prefs)      # 申請前評分篩選
+3. [執行技能]
+4. 品質保證代理人   → generateReport()            # 通過 / 警告 / 失敗
+```
+
+代理人文件：[`skills/agents/`](./skills/agents/)
+
 ---
 
 ## 技能一：自動投遞職缺
@@ -24,13 +45,14 @@
 ### 主要功能
 
 - **僅限 Easy Apply**：僅針對 LinkedIn Easy Apply 職缺操作，非 Easy Apply 職缺自動略過
-- **問卷自動填寫**：遇到申請表單時，以合理預設值填寫欄位，不跳過職缺
+- **問卷自動填寫**：遇到申請表單時，以個人設定值填寫欄位，不跳過職缺
 - **目標數量控制**：達到指定申請數量後自動停止
 - **鍵盤控制**：按 P 暫停、R 繼續、Q 結束
 - **頁面狀態顯示**：即時顯示申請進度的浮動視窗
-- **智慧過濾**：自動略過已申請及非 Easy Apply 職缺
+- **智慧過濾**：自動略過已申請、非 Easy Apply，以及跨頁重複職缺
 - **擬人化延遲**：隨機延遲，降低被偵測風險
 - **完整錯誤處理**：單一職缺失敗不影響整體流程
+- **代理人系統**：策略、自動化、網頁結構、品質保證四大代理人確保穩定性
 
 ### 設定參數
 
@@ -39,10 +61,33 @@
 | `startPage` | 1 | 起始頁碼 |
 | `targetApplications` | 20 | 目標申請數量 |
 | `maxPages` | 20 | 最大處理頁數 |
-| `searchKeywords` | 'software engineer' | 職缺搜尋關鍵字 |
-| `location` | 'United States' | 工作地點 |
-| `delayMin` | 2000 | 最短延遲時間（毫秒） |
-| `delayMax` | 4000 | 最長延遲時間（毫秒） |
+| `searchKeywords` | `'software engineer'` | 職缺搜尋關鍵字 |
+| `location` | `'United States'` | 工作地點 |
+| `delayMin` | 3000 | 最短延遲時間（毫秒） |
+| `delayMax` | 5000 | 最長延遲時間（毫秒） |
+| `userProfile.phone` | `'0000000000'` | 申請表單用電話號碼 |
+| `userProfile.linkedinUrl` | `'...'` | 申請表單用 LinkedIn 網址 |
+| `userProfile.city` | `'Remote'` | 申請表單用城市 |
+| `userProfile.zip` | `'00000'` | 申請表單用郵遞區號 |
+| `userProfile.yearsExp` | `3` | 申請表單用年資數值 |
+
+### 快速開始
+
+```javascript
+await autoApplyLinkedInJobs(page, {
+  targetApplications: 20,
+  searchKeywords: 'software engineer',
+  location: 'United States',
+  userProfile: {
+    phone: '+886-912-345-678',
+    linkedinUrl: 'https://www.linkedin.com/in/yourhandle',
+    city: 'Taipei',
+    zip: '10001',
+    yearsExp: 5
+  }
+});
+// 鍵盤控制：P=暫停  R=繼續  Q=結束
+```
 
 ### 使用範例
 
@@ -57,21 +102,24 @@
 在舊金山灣區投遞後端開發職缺，目標 25 份申請，僅限 Easy Apply
 ```
 
-### 問卷填寫預設值
+### 問卷填寫邏輯
 
-當遇到申請表單時，系統會以下列預設值自動填寫：
+當遇到申請表單時，系統優先使用 `userProfile` 中的個人設定值，若未設定則使用預設值：
 
-| 欄位類型 | 預設行為 |
+| 欄位類型 | 填寫來源 |
 |----------|----------|
-| 電話欄位 | 填入 `0000000000` |
-| 年資／經驗欄位 | 填入 `3`（年） |
+| 電話欄位 | `userProfile.phone`（未設定則填 `0000000000`） |
+| 年資／經驗欄位 | `userProfile.yearsExp`（未設定則填 `3`） |
 | 薪資欄位 | 填入 `0` |
-| URL／網站欄位 | 填入 LinkedIn 個人頁面網址 |
-| 城市／地址欄位 | 填入 `Remote` |
+| URL／網站欄位 | `userProfile.linkedinUrl` |
+| 城市／地址欄位 | `userProfile.city`（未設定則填 `Remote`） |
+| 郵遞區號欄位 | `userProfile.zip`（未設定則填 `00000`） |
 | 其他文字欄位 | 填入 `N/A` |
 | 下拉選單 | 選擇第一個有效選項 |
 | 單選按鈕 | 選擇每組第一個選項 |
 | 必填文字區塊 | 填入通用說明文字 |
+
+建議在 `userProfile` 填入真實資料，避免使用過於明顯的預設值被 LinkedIn 偵測。
 
 ---
 
