@@ -75,38 +75,90 @@ async function autoApplyLinkedInJobs(page, options = {}) {
     await p.evaluate(() => {
       const modal = document.querySelector('[role="dialog"], .jobs-easy-apply-modal');
       if (!modal) return;
+
+      function getLabel(el) {
+        const ariaLabel = el.getAttribute('aria-label') || '';
+        const labelEl = el.id ? document.querySelector(`label[for="${el.id}"]`) : null;
+        return (ariaLabel + ' ' + (labelEl ? labelEl.textContent : '')).toLowerCase();
+      }
+
       function dispatch(el) {
         el.dispatchEvent(new Event('input', { bubbles: true }));
         el.dispatchEvent(new Event('change', { bubbles: true }));
       }
-      modal.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input:not([type])').forEach(input => {
+
+      // Text / email / tel inputs
+      modal.querySelectorAll(
+        'input[type="text"], input[type="email"], input[type="tel"], input:not([type])'
+      ).forEach(input => {
         if (input.value.trim()) return;
-        const label = (input.getAttribute('aria-label') || '').toLowerCase();
-        if (label.includes('phone') || label.includes('mobile')) input.value = '0912345678';
-        else if (label.includes('linkedin') || label.includes('url')) input.value = 'https://www.linkedin.com/in/me';
-        else input.value = 'N/A';
+        const label = getLabel(input);
+        if (label.includes('phone') || label.includes('tel') || label.includes('mobile')) {
+          input.value = '0000000000';
+        } else if (label.includes('linkedin') || label.includes('url') || label.includes('website')) {
+          input.value = 'https://www.linkedin.com/in/me';
+        } else if (label.includes('city') || label.includes('address')) {
+          input.value = 'Remote';
+        } else if (label.includes('zip') || label.includes('postal')) {
+          input.value = '00000';
+        } else {
+          input.value = 'N/A';
+        }
         dispatch(input);
       });
+
+      // Number inputs
       modal.querySelectorAll('input[type="number"]').forEach(input => {
         if (input.value.trim()) return;
-        input.value = '3'; dispatch(input);
+        const label = getLabel(input);
+        if (label.includes('year') || label.includes('experience') || label.includes('exp')) {
+          input.value = '3';
+        } else if (label.includes('salary') || label.includes('rate') || label.includes('compensation')) {
+          input.value = '0';
+        } else {
+          input.value = '1';
+        }
+        dispatch(input);
       });
+
+      // Native <select> dropdowns
       modal.querySelectorAll('select').forEach(select => {
         if (select.value) return;
-        const firstReal = Array.from(select.options).find(o => o.value && o.value !== '' && !o.disabled);
-        if (firstReal) { select.value = firstReal.value; dispatch(select); }
+        const firstReal = Array.from(select.options).find(
+          o => o.value && o.value !== '' && !o.disabled
+        );
+        if (firstReal) {
+          select.value = firstReal.value;
+          dispatch(select);
+        }
       });
+
+      // Radio groups
       const radioGroups = {};
       modal.querySelectorAll('input[type="radio"]').forEach(radio => {
-        const key = radio.name || radio.getAttribute('aria-name') || radio.closest('fieldset')?.id || 'unnamed';
+        const key =
+          radio.name ||
+          radio.getAttribute('aria-name') ||
+          radio.closest('fieldset')?.id ||
+          'unnamed';
         if (!radioGroups[key]) radioGroups[key] = [];
         radioGroups[key].push(radio);
       });
       Object.values(radioGroups).forEach(group => {
-        if (!group.some(r => r.checked)) group[0].click();
+        if (group.some(r => r.checked)) return;
+        const first = group[0];
+        first.checked = true;
+        first.dispatchEvent(new Event('click', { bubbles: true }));
+        dispatch(first);
       });
+
+      // Textareas
       modal.querySelectorAll('textarea').forEach(ta => {
-        if (!ta.value.trim()) { ta.value = 'N/A'; dispatch(ta); }
+        if (ta.value.trim()) return;
+        if (ta.required || ta.getAttribute('aria-required') === 'true') {
+          ta.value = 'Please see my LinkedIn profile and resume for details.';
+          dispatch(ta);
+        }
       });
     });
     await p.waitForTimeout(500);
@@ -134,13 +186,13 @@ async function autoApplyLinkedInJobs(page, options = {}) {
     const jobs = await page.evaluate(() => {
       const cards = document.querySelectorAll('.job-card-container, .jobs-search-results__list-item');
       return Array.from(cards).map((c, i) => {
-        const titleEl = c.querySelector('.job-card-list__title');
+        const titleEl = c.querySelector('.job-card-list__title, .job-card-container__link');
         const linkEl = c.querySelector('a');
         return {
           index: i,
-          title: titleEl?.innerText || 'Unknown',
+          title: titleEl?.innerText?.trim() || 'Unknown',
           url: linkEl?.href || null,
-          hasEasyApply: !!c.querySelector('button[aria-label*="Easy Apply"]'),
+          hasEasyApply: !!c.querySelector('button[aria-label*="Easy Apply"]') || c.innerText.includes('Easy Apply'),
           alreadyApplied: c.innerText.includes('Applied') || c.innerText.includes('applied')
         };
       });
