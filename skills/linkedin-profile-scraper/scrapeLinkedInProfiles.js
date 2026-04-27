@@ -110,15 +110,15 @@ async function scrapeLinkedInProfiles(page, options = {}) {
       await page.waitForTimeout(2500);
 
       // Scroll to trigger lazy-loaded experience section.
-      // LinkedIn virtualizes section content — scroll the #experience anchor
-      // into view rather than the window, then wait for content to mount.
+      // Scroll #experience anchor into view via evaluate (not page.locator)
+      // so the same code works in both Playwright and the mock test environment.
       await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 3));
       await page.waitForTimeout(600);
-      const expAnchor = page.locator('#experience');
-      if (await expAnchor.count() > 0) {
-        await expAnchor.scrollIntoViewIfNeeded();
-        await page.waitForTimeout(900);
-      }
+      await page.evaluate(() => {
+        const el = document.querySelector('#experience');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      await page.waitForTimeout(900);
       await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
       await page.waitForTimeout(800);
 
