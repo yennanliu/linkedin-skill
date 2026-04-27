@@ -1,12 +1,10 @@
 /**
- * LinkedIn Job Auto-Apply Automation Script
+ * LinkedIn Job Auto-Apply Automation Script (Multi-Tab Version)
  *
  * Features:
- * - Robust "Easy Apply" detection using multiple selector strategies.
- * - Explicit filter activation: Automatically toggles "Easy Apply" if no jobs are found.
+ * - Isolated application flow: Opens each job in a new tab to preserve search results.
+ * - Robust "Easy Apply" detection and form filling.
  * - Intelligent modal navigation: Handles single and multi-step applications.
- * - Questionnaire support: Fills fields with sensible default values to prevent skips.
- * - Interruption handling: Automatically skips "Update profile" or "Verification" modals.
  * - Keyboard controls: P=Pause, R=Resume, Q=Quit.
  * - Status indicator: On-page overlay showing real-time progress.
  */
@@ -49,12 +47,14 @@ async function autoApplyLinkedInJobs(page, options = {}) {
   }
 
   async function updateStatus(txt, color = '#0a66c2') {
-    await page.evaluate(({ t, c }) => {
-      const el = document.getElementById('ln-status');
-      const div = document.getElementById('linkedin-auto-apply-status');
-      if (el) el.textContent = t;
-      if (div) div.style.background = c;
-    }, { t: txt, c: color });
+    try {
+      await page.evaluate(({ t, c }) => {
+        const el = document.getElementById('ln-status');
+        const div = document.getElementById('linkedin-auto-apply-status');
+        if (el) el.textContent = t;
+        if (div) div.style.background = c;
+      }, { t: txt, c: color });
+    } catch (e) {}
   }
 
   async function checkState() {
@@ -71,36 +71,45 @@ async function autoApplyLinkedInJobs(page, options = {}) {
     return shouldQuit;
   }
 
-  async function fillFormDefaults() {
-    await page.evaluate(() => {
-      const modal = document.querySelector('[role="dialog"]');
+  async function fillFormDefaults(p) {
+    await p.evaluate(() => {
+      const modal = document.querySelector('[role="dialog"], .jobs-easy-apply-modal');
       if (!modal) return;
-      modal.querySelectorAll('input[type="text"], input[type="tel"], textarea').forEach(el => {
-        if (el.value.trim()) return;
-        const label = (el.labels?.[0]?.innerText || el.ariaLabel || '').toLowerCase();
-        if (label.includes('phone') || label.includes('mobile')) el.value = '5550123456';
-        else if (label.includes('experience') || label.includes('years')) el.value = '3';
-        else el.value = 'N/A';
+      function dispatch(el) {
         el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      modal.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input:not([type])').forEach(input => {
+        if (input.value.trim()) return;
+        const label = (input.getAttribute('aria-label') || '').toLowerCase();
+        if (label.includes('phone') || label.includes('mobile')) input.value = '0912345678';
+        else if (label.includes('linkedin') || label.includes('url')) input.value = 'https://www.linkedin.com/in/me';
+        else input.value = 'N/A';
+        dispatch(input);
+      });
+      modal.querySelectorAll('input[type="number"]').forEach(input => {
+        if (input.value.trim()) return;
+        input.value = '3'; dispatch(input);
+      });
+      modal.querySelectorAll('select').forEach(select => {
+        if (select.value) return;
+        const firstReal = Array.from(select.options).find(o => o.value && o.value !== '' && !o.disabled);
+        if (firstReal) { select.value = firstReal.value; dispatch(select); }
       });
       const radioGroups = {};
-      modal.querySelectorAll('input[type="radio"]').forEach(r => {
-        if (!radioGroups[r.name]) radioGroups[r.name] = [];
-        radioGroups[r.name].push(r);
+      modal.querySelectorAll('input[type="radio"]').forEach(radio => {
+        const key = radio.name || radio.getAttribute('aria-name') || radio.closest('fieldset')?.id || 'unnamed';
+        if (!radioGroups[key]) radioGroups[key] = [];
+        radioGroups[key].push(radio);
       });
       Object.values(radioGroups).forEach(group => {
         if (!group.some(r => r.checked)) group[0].click();
       });
-      modal.querySelectorAll('select').forEach(s => {
-        if (!s.value) {
-          const validOption = Array.from(s.options).find(o => o.value && !o.disabled);
-          if (validOption) {
-            s.value = validOption.value;
-            s.dispatchEvent(new Event('change', { bubbles: true }));
-          }
-        }
+      modal.querySelectorAll('textarea').forEach(ta => {
+        if (!ta.value.trim()) { ta.value = 'N/A'; dispatch(ta); }
       });
     });
+    await p.waitForTimeout(500);
   }
 
   let currentPage = startPage;
@@ -124,80 +133,89 @@ async function autoApplyLinkedInJobs(page, options = {}) {
 
     const jobs = await page.evaluate(() => {
       const cards = document.querySelectorAll('.job-card-container, .jobs-search-results__list-item');
-      return Array.from(cards).map((c, i) => ({
-        index: i,
-        title: c.querySelector('.job-card-list__title')?.innerText || 'Unknown',
-        hasEasyApply: c.innerText.includes('Easy Apply'),
-        alreadyApplied: c.innerText.includes('Applied') || c.innerText.includes('applied')
-      }));
+      return Array.from(cards).map((c, i) => {
+        const titleEl = c.querySelector('.job-card-list__title');
+        const linkEl = c.querySelector('a');
+        return {
+          index: i,
+          title: titleEl?.innerText || 'Unknown',
+          url: linkEl?.href || null,
+          hasEasyApply: !!c.querySelector('button[aria-label*="Easy Apply"]'),
+          alreadyApplied: c.innerText.includes('Applied') || c.innerText.includes('applied')
+        };
+      });
     });
 
     if (jobs.length === 0) break;
 
     for (const job of jobs) {
       if (await checkState() || stats.successful >= targetApplications) break;
-      if (job.alreadyApplied || !job.hasEasyApply) { stats.skipped++; continue; }
+      if (job.alreadyApplied || !job.hasEasyApply || !job.url) { stats.skipped++; continue; }
 
-      await updateStatus(`Job: ${job.title.substring(0, 15)}... (${stats.successful}/${targetApplications})`);
+      await updateStatus(`Apply: ${job.title.substring(0, 15)}... (${stats.successful}/${targetApplications})`);
+      
+      const context = page.context();
+      const newTab = await context.newPage();
       try {
-        await page.evaluate((idx) => {
-          const cards = document.querySelectorAll('.job-card-container, .jobs-search-results__list-item');
-          cards[idx]?.querySelector('a')?.click();
-        }, job.index);
-        await page.waitForTimeout(2000);
+        await newTab.goto(job.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+        await newTab.waitForTimeout(3000);
 
-        const clicked = await page.evaluate(() => {
-          const btn = Array.from(document.querySelectorAll('button')).find(b => b.innerText.includes('Easy Apply') || b.ariaLabel?.includes('Easy Apply'));
+        const clicked = await newTab.evaluate(() => {
+          const btn = document.querySelector('.jobs-apply-button--top-card button[aria-label*="Easy Apply"], .jobs-s-apply button[aria-label*="Easy Apply"]');
           if (btn) { btn.click(); return true; }
           return false;
         });
-        if (!clicked) { stats.skipped++; continue; }
-        await page.waitForTimeout(3000);
+
+        if (!clicked) {
+          stats.skipped++;
+          await newTab.close();
+          continue;
+        }
+
+        await newTab.waitForTimeout(3000);
 
         let step = 0;
         let jobApplied = false;
         while (step < 12) {
           step++;
-          const modalExists = await page.evaluate(() => !!document.querySelector('[role="dialog"]'));
+          const modalExists = await newTab.evaluate(() => !!document.querySelector('[role="dialog"]'));
           if (!modalExists) break;
 
-          const interrupted = await page.evaluate(() => {
+          await fillFormDefaults(newTab);
+          const action = await newTab.evaluate(() => {
             const btns = Array.from(document.querySelectorAll('button'));
-            const notNow = btns.find(b => b.innerText.includes('Not now') || b.innerText.includes('No thanks'));
-            if (notNow) { notNow.click(); return true; }
-            return false;
-          });
-          if (interrupted) { await page.waitForTimeout(2000); continue; }
-
-          await fillFormDefaults();
-          const action = await page.evaluate(() => {
-            const btns = Array.from(document.querySelectorAll('button'));
-            const submit = btns.find(b => b.innerText.trim() === 'Submit application' || b.innerText.trim() === 'Submit');
+            const submit = btns.find(b => b.textContent.includes('Submit application') || b.textContent.trim() === 'Submit');
             if (submit) { submit.click(); return 'submitted'; }
-            const next = btns.find(b => b.innerText.includes('Next') || b.innerText.includes('Continue') || b.innerText.includes('Review'));
+            const next = btns.find(b => b.textContent.includes('Next') || b.textContent.includes('Continue') || b.textContent.includes('Review'));
             if (next) { next.click(); return 'next'; }
-            return 'stuck';
+            return 'none';
           });
 
           if (action === 'submitted') {
-            await page.waitForTimeout(4000);
-            jobApplied = true;
-            await page.evaluate(() => document.querySelector('button[aria-label*="Dismiss"], button[data-test-modal-close-btn]')?.click());
+            await newTab.waitForTimeout(4000);
+            const success = await newTab.evaluate(() => {
+              const t = document.body.textContent;
+              return t.includes('Application sent') || t.includes('Your application was sent') || t.includes('Application submitted');
+            });
+            if (success) jobApplied = true;
             break;
           }
-          if (action === 'stuck') {
-            await page.evaluate(() => document.querySelector('button[aria-label*="Dismiss"], button[data-test-modal-close-btn]')?.click());
-            break;
-          }
-          await page.waitForTimeout(2500);
+          if (action === 'none') break;
+          await newTab.waitForTimeout(2000);
         }
+        
         if (jobApplied) {
           stats.successful++;
           console.log(`✅ Applied: ${job.title}`);
         } else {
           stats.failed++;
         }
-      } catch (err) { stats.failed++; }
+      } catch (err) {
+        stats.failed++;
+      } finally {
+        await newTab.close();
+      }
+      
       stats.totalProcessed++;
       await page.waitForTimeout(delayMin + Math.random() * (delayMax - delayMin));
     }
