@@ -4,7 +4,7 @@
 
 🌐 **[English README](README.md)** | 🌐 **[造訪專案](https://github.com/yennanliu/linkedin-skill)** | 🚀 **[快速開始](QUICKSTART.md)**
 
-兩個使用 Playwright MCP 工具在 LinkedIn 上自動化操作的 Claude Code 技能。
+三個使用 Playwright MCP 工具在 LinkedIn 上自動化操作的 Claude Code 技能。
 
 ---
 
@@ -14,10 +14,11 @@
 |------|----------|------|
 | 自動投遞職缺 | `/linkedin-job-auto-apply` | 批次投遞 Easy Apply 職缺 |
 | 個人檔案爬取 | `/linkedin-profile-scraper` | 依公司／國家／產業爬取個人檔案 |
+| 聯絡人擴展 | `/linkedin-contact-reacher` | BFS/DFS 探索聯絡人、產生 Email 候選、發送連結邀請 |
 
 ## 專業代理人系統
 
-四個專業代理人在需要時提供更深入的支援：
+七個專業代理人在需要時提供更深入的支援：
 
 | 代理人 | 技能名稱 | 功能 |
 |--------|---------|------|
@@ -25,6 +26,9 @@
 | **自動化代理人** | `linkedin-automation-agent` | 時間控制、重試邏輯、速率限制、防偵測模式 |
 | **網頁結構代理人** | `linkedin-web-structure-agent` | LinkedIn DOM 選擇器、延遲載入、虛擬捲動、穩健元素定位 |
 | **品質保證代理人** | `linkedin-qa-agent` | 啟動前檢查、結果驗證、資料品質報告 |
+| **聯絡人探索代理人** | `linkedin-contact-discovery-agent` | BFS/DFS 策略、種子選擇、探索深度調整 |
+| **外展代理人** | `linkedin-outreach-agent` | 連結邀請模板、速率限制、接受率優化 |
+| **Email 產生代理人** | `linkedin-email-generator-agent` | Email 模式產生、網域推斷、信心分數 |
 
 **建議執行流程：**
 ```
@@ -173,6 +177,55 @@ const results = await scrapeLinkedInProfiles(page, {
 ```
 
 詳細使用說明請參閱 [PROFILE_SCRAPER.md](PROFILE_SCRAPER.md)。
+
+---
+
+## 技能三：聯絡人擴展
+
+透過 BFS/DFS 圖形遍歷有系統地探索 LinkedIn 聯絡人，適用於求職推薦或拓展人脈。可產生 Email 候選名單、發送個人化連結邀請，並將結果存成 JSON + CSV。
+
+### 主要功能
+
+- **BFS 或 DFS 遍歷**：廣度優先（同公司多人）或深度優先（從信任的人展開人脈）
+- **Email 候選產生**：每位聯絡人產生最多 10 種格式（firstname.lastname、flastname 等）
+- **網域推斷**：內建知名公司對照表 + 自動推斷備援
+- **選擇性外展**：可發送推薦或人脈拓展連結邀請
+- **本地輸出**：帶時間戳記的 JSON + CSV 檔案
+- **速率安全**：可設定延遲、Session 上限、跨頁去重複
+
+### 快速開始
+
+```javascript
+// 第一步 — 探索聯絡人（貼上 discoverContacts.js）：
+const contacts = await discoverContacts(page, {
+  seeds: [
+    { type: 'search', company: 'Google', role: 'Engineering Manager' },
+    { type: 'search', company: 'Google', role: 'Software Engineer' }
+  ],
+  strategy: 'bfs',
+  maxContacts: 30,
+  maxDepth: 1,
+  targetCompanies: ['Google'],
+});
+
+// 第二步 — 補充 Email 候選（貼上 extractContactInfo.js）：
+const enriched = await extractContactInfo(page, contacts, {
+  companyDomains: { 'Google': 'google.com' },
+});
+
+// 第三步 — 儲存結果（貼上 saveOutput.js）：
+await saveOutput(enriched, { label: 'google-referrals', format: 'both' });
+// 輸出：./output/google-referrals_時間戳記.{json,csv}
+
+// 第四步 — 選擇性發送連結邀請（貼上 reachContacts.js）：
+await reachContacts(page, enriched, {
+  purpose: 'referral',
+  userProfile: { name: '您的姓名', role: 'Software Engineer', targetCompany: 'Google' },
+  maxPerSession: 10,
+});
+```
+
+詳細說明請參閱 [skills/linkedin-contact-reacher/SKILL.md](skills/linkedin-contact-reacher/SKILL.md)。
 
 ---
 

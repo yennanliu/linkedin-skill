@@ -1,6 +1,6 @@
 # LinkedIn Skills
 
-Two LinkedIn automation skills using Playwright browser tools, backed by three specialist agents.
+Three LinkedIn automation skills using Playwright browser tools, backed by seven specialist agents.
 
 ---
 
@@ -12,6 +12,9 @@ Two LinkedIn automation skills using Playwright browser tools, backed by three s
 | **Automation Agent** | `skills/agents/automation-agent/SKILL.md` | Timing, retry logic, rate limiting, anti-detection |
 | **Web Structure Agent** | `skills/agents/web-structure-agent/SKILL.md` | Broken selectors, LinkedIn DOM changes, lazy loading |
 | **QA Agent** | `skills/agents/qa-agent/SKILL.md` | Pre-flight checks, verify results, data quality reports |
+| **Contact Discovery Agent** | `skills/agents/contact-discovery-agent/SKILL.md` | BFS/DFS strategy, seed selection, traversal tuning |
+| **Outreach Agent** | `skills/agents/outreach-agent/SKILL.md` | Connection note templates, rate limits, acceptance rates |
+| **Email Generator Agent** | `skills/agents/email-generator-agent/SKILL.md` | Email patterns, domain inference, confidence scoring |
 
 **Orchestrated run order:**
 1. QA Agent: `preFlightCheck(page)` — must PASS before continuing
@@ -63,6 +66,33 @@ console.log(JSON.stringify(results, null, 2));
 ```
 
 Files: `scrapeLinkedInProfiles.js`, `scrapeSingleProfile.js`
+
+---
+
+## Skill 3: Contact Reacher
+
+Discover contacts via BFS/DFS, enrich with email candidates, optionally send connection requests, save JSON + CSV.
+
+```javascript
+// Paste discoverContacts.js, then:
+const contacts = await discoverContacts(page, {
+  seeds: [{ type: 'search', company: 'Google', role: 'Software Engineer' }],
+  strategy: 'bfs',
+  maxContacts: 30,
+  maxDepth: 1,
+  targetCompanies: ['Google'],
+});
+
+// Paste extractContactInfo.js, then:
+const enriched = await extractContactInfo(page, contacts, {
+  companyDomains: { 'Google': 'google.com' },
+});
+
+// Paste saveOutput.js, then:
+await saveOutput(enriched, { label: 'google-referrals', format: 'both' });
+```
+
+Files: `discoverContacts.js`, `extractContactInfo.js`, `reachContacts.js`, `saveOutput.js`
 
 ---
 
