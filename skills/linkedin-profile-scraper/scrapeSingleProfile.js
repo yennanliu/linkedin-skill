@@ -26,11 +26,11 @@ async function scrapeSingleProfile(page, profileUrl) {
     // mounts the virtualized experience content before we extract it.
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 3));
     await page.waitForTimeout(600);
-    const expAnchor = page.locator('#experience');
-    if (await expAnchor.count() > 0) {
-      await expAnchor.scrollIntoViewIfNeeded();
-      await page.waitForTimeout(900);
-    }
+    await page.evaluate(() => {
+      const el = document.querySelector('#experience');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    await page.waitForTimeout(900);
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.waitForTimeout(1000);
 

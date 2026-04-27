@@ -357,7 +357,7 @@ jobs:
             const checks = [
               ['skills/linkedin-job-auto-apply/autoApplyLinkedInJobs.js', 'async function autoApplyLinkedInJobs(page, options = {})'],
               ['skills/linkedin-job-auto-apply/applySingleJob.js',        'async function listJobs(page)'],
-              ['skills/linkedin-job-auto-apply/applySingleJob.js',        'async function applySingleJob(page, jobIndex)'],
+              ['skills/linkedin-job-auto-apply/applySingleJob.js',        'async function applySingleJob(page, jobIndex, userProfile = {})'],
               ['skills/linkedin-profile-scraper/scrapeLinkedInProfiles.js','async function scrapeLinkedInProfiles(page, options = {})'],
               ['skills/linkedin-profile-scraper/scrapeSingleProfile.js',  'async function scrapeSingleProfile(page, profileUrl)'],
             ];
