@@ -1,11 +1,11 @@
 ---
 name: linkedin-skills
-description: Two LinkedIn automation skills — (1) auto-apply to Easy Apply jobs, (2) scrape profile data by company/country/industry. Uses Playwright MCP browser automation.
+description: Three LinkedIn automation skills — (1) auto-apply to Easy Apply jobs, (2) scrape profile data by company/country/industry, (3) discover contacts via BFS/DFS for referrals/networking with email generation. Uses Playwright MCP browser automation.
 ---
 
 # LinkedIn Skills
 
-Two skills for LinkedIn automation via Playwright MCP browser tools.
+Three skills for LinkedIn automation via Playwright MCP browser tools.
 
 ---
 
@@ -50,6 +50,36 @@ console.log(JSON.stringify(results, null, 2));
 
 ---
 
+## Skill 3: Contact Reacher
+
+Systematically discover LinkedIn contacts for job referrals or networking using BFS/DFS traversal. Extracts LinkedIn URLs, generates company email candidates, optionally sends connection requests, and saves output locally as JSON + CSV.
+
+**Usage:** `/linkedin-contact-reacher`
+
+Full docs: [skills/linkedin-contact-reacher/SKILL.md](./skills/linkedin-contact-reacher/SKILL.md)
+
+```javascript
+// Paste discoverContacts.js, then:
+const contacts = await discoverContacts(page, {
+  seeds: [{ type: 'search', company: 'Google', role: 'Software Engineer' }],
+  strategy: 'bfs',
+  maxContacts: 30,
+  maxDepth: 1,
+  targetCompanies: ['Google'],
+});
+
+// Paste extractContactInfo.js, then:
+const enriched = await extractContactInfo(page, contacts, {
+  companyDomains: { 'Google': 'google.com' },
+});
+
+// Paste saveOutput.js, then:
+await saveOutput(enriched, { label: 'google-referrals', format: 'both' });
+// Output: ./output/google-referrals_2026-04-27T....{json,csv}
+```
+
+---
+
 ## Specialized Agents
 
 Both skills are backed by three specialist agents for deeper control:
@@ -60,6 +90,9 @@ Both skills are backed by three specialist agents for deeper control:
 | **Automation Agent** | `linkedin-automation-agent` | Timing, retry logic, rate limiting, anti-detection patterns |
 | **Web Structure Agent** | `linkedin-web-structure-agent` | LinkedIn DOM selectors, lazy loading, resilient element targeting |
 | **QA Agent** | `linkedin-qa-agent` | Pre-flight checks, result verification, data quality reports |
+| **Contact Discovery Agent** | `linkedin-contact-discovery-agent` | BFS/DFS traversal strategy, seed selection, depth tuning |
+| **Outreach Agent** | `linkedin-outreach-agent` | Connection note templates, rate limits, acceptance rate optimization |
+| **Email Generator Agent** | `linkedin-email-generator-agent` | Email pattern generation, domain inference, confidence scoring |
 
 Full agent docs: [`skills/agents/`](./skills/agents/)
 

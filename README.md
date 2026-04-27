@@ -1,6 +1,6 @@
 # LinkedIn Skills for Claude Code
 
-Two Claude Code skills for LinkedIn automation using Playwright MCP tools.
+Three Claude Code skills for LinkedIn automation using Playwright MCP tools.
 
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/yennanliu/linkedin-skill)
 
@@ -14,10 +14,11 @@ Two Claude Code skills for LinkedIn automation using Playwright MCP tools.
 |-------|--------|-------------|
 | Job Auto-Apply | `/linkedin-job-auto-apply` | Apply to Easy Apply jobs in batch |
 | Profile Scraper | `/linkedin-profile-scraper` | Scrape profiles by company/country/industry |
+| Contact Reacher | `/linkedin-contact-reacher` | Discover contacts via BFS/DFS, generate email candidates, send connection requests |
 
 ## Specialized Agents
 
-Four agents back both skills with deeper expertise on demand:
+Seven agents back all skills with deeper expertise on demand:
 
 | Agent | Skill Name | Purpose |
 |-------|-----------|---------|
@@ -25,6 +26,9 @@ Four agents back both skills with deeper expertise on demand:
 | **Automation Agent** | `linkedin-automation-agent` | Timing, retry logic, rate limiting, anti-detection patterns |
 | **Web Structure Agent** | `linkedin-web-structure-agent` | LinkedIn DOM selectors, lazy loading, virtual scroll, resilient targeting |
 | **QA Agent** | `linkedin-qa-agent` | Pre-flight checks, result verification, data quality reports |
+| **Contact Discovery Agent** | `linkedin-contact-discovery-agent` | BFS/DFS traversal strategy, seed selection, depth tuning |
+| **Outreach Agent** | `linkedin-outreach-agent` | Connection note templates, rate limits, acceptance rate optimization |
+| **Email Generator Agent** | `linkedin-email-generator-agent` | Email pattern generation, domain inference, confidence scoring |
 
 **Orchestrated run flow:**
 ```
@@ -155,6 +159,56 @@ const results = await scrapeLinkedInProfiles(page, {
 ```
 
 For a detailed guide, see [PROFILE_SCRAPER.md](PROFILE_SCRAPER.md).
+
+---
+
+## Skill 3: Contact Reacher
+
+Systematically discover LinkedIn contacts for job referrals or networking using BFS/DFS graph traversal. Enriches contacts with email candidates, optionally sends personalized connection requests, and saves results locally as JSON + CSV.
+
+### Key Features
+
+- **BFS or DFS Traversal**: Broad company sweep (BFS) or deep personal network exploration (DFS)
+- **Email Candidate Generation**: 10 pattern variants per contact (firstname.lastname, flastname, etc.)
+- **Domain Inference**: Well-known company domains + slugify fallback
+- **Optional Outreach**: Send personalized connection requests with referral or networking templates
+- **Local Output**: JSON + CSV files with timestamps
+- **Rate-Safe**: Configurable delays, session caps, per-contact deduplication
+
+### Quick Start
+
+```javascript
+// Step 1 — Discover contacts (paste discoverContacts.js):
+const contacts = await discoverContacts(page, {
+  seeds: [
+    { type: 'search', company: 'Google', role: 'Engineering Manager' },
+    { type: 'search', company: 'Google', role: 'Software Engineer' }
+  ],
+  strategy: 'bfs',
+  maxContacts: 30,
+  maxDepth: 1,
+  targetCompanies: ['Google'],
+  targetRoles: ['engineer', 'manager'],
+});
+
+// Step 2 — Enrich with email candidates (paste extractContactInfo.js):
+const enriched = await extractContactInfo(page, contacts, {
+  companyDomains: { 'Google': 'google.com' },
+});
+
+// Step 3 — Save output (paste saveOutput.js):
+await saveOutput(enriched, { label: 'google-referrals', format: 'both' });
+// Output: ./output/google-referrals_TIMESTAMP.{json,csv}
+
+// Step 4 — Optionally send connection requests (paste reachContacts.js):
+await reachContacts(page, enriched, {
+  purpose: 'referral',
+  userProfile: { name: 'Your Name', role: 'Software Engineer', targetCompany: 'Google' },
+  maxPerSession: 10,
+});
+```
+
+For full docs, see [skills/linkedin-contact-reacher/SKILL.md](skills/linkedin-contact-reacher/SKILL.md).
 
 ---
 
