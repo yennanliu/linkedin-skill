@@ -17,8 +17,22 @@ async function autoApplyLinkedInJobs(page, options = {}) {
     searchKeywords = 'software engineer',
     location = 'United States',
     delayMin = 3000,
-    delayMax = 5000
+    delayMax = 5000,
+    // userProfile: personal values used when filling Easy Apply form fields.
+    // Set these to avoid detectable placeholder values like '0000000000'.
+    userProfile = {}
   } = options;
+
+  const formProfile = {
+    phone: userProfile.phone || '0000000000',
+    linkedinUrl: userProfile.linkedinUrl || 'https://www.linkedin.com/in/me',
+    city: userProfile.city || 'Remote',
+    zip: userProfile.zip || '00000',
+    yearsExp: userProfile.yearsExp || 3,
+  };
+
+  // Track processed job URLs to avoid re-applying to the same job on multiple pages
+  const processedUrls = new Set();
 
   const stats = { successful: 0, failed: 0, skipped: 0, totalProcessed: 0 };
   let isPaused = false;
@@ -72,7 +86,7 @@ async function autoApplyLinkedInJobs(page, options = {}) {
   }
 
   async function fillFormDefaults(p) {
-    await p.evaluate(() => {
+    await p.evaluate((fp) => {
       const modal = document.querySelector('[role="dialog"], .jobs-easy-apply-modal');
       if (!modal) return;
 
@@ -94,13 +108,13 @@ async function autoApplyLinkedInJobs(page, options = {}) {
         if (input.value.trim()) return;
         const label = getLabel(input);
         if (label.includes('phone') || label.includes('tel') || label.includes('mobile')) {
-          input.value = '0000000000';
+          input.value = fp.phone;
         } else if (label.includes('linkedin') || label.includes('url') || label.includes('website')) {
-          input.value = 'https://www.linkedin.com/in/me';
+          input.value = fp.linkedinUrl;
         } else if (label.includes('city') || label.includes('address')) {
-          input.value = 'Remote';
+          input.value = fp.city;
         } else if (label.includes('zip') || label.includes('postal')) {
-          input.value = '00000';
+          input.value = fp.zip;
         } else {
           input.value = 'N/A';
         }
@@ -112,7 +126,7 @@ async function autoApplyLinkedInJobs(page, options = {}) {
         if (input.value.trim()) return;
         const label = getLabel(input);
         if (label.includes('year') || label.includes('experience') || label.includes('exp')) {
-          input.value = '3';
+          input.value = String(fp.yearsExp);
         } else if (label.includes('salary') || label.includes('rate') || label.includes('compensation')) {
           input.value = '0';
         } else {
@@ -160,7 +174,7 @@ async function autoApplyLinkedInJobs(page, options = {}) {
           dispatch(ta);
         }
       });
-    });
+    }, formProfile);
     await p.waitForTimeout(500);
   }
 
@@ -203,6 +217,8 @@ async function autoApplyLinkedInJobs(page, options = {}) {
     for (const job of jobs) {
       if (await checkState() || stats.successful >= targetApplications) break;
       if (job.alreadyApplied || !job.hasEasyApply || !job.url) { stats.skipped++; continue; }
+      if (processedUrls.has(job.url)) { stats.skipped++; continue; }
+      processedUrls.add(job.url);
 
       await updateStatus(`Apply: ${job.title.substring(0, 15)}... (${stats.successful}/${targetApplications})`);
       

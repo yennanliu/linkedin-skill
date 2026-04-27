@@ -13,23 +13,46 @@ This skill is backed by three specialist agents. Invoke them for deeper help:
 
 | Agent | File | When to Use |
 |-------|------|-------------|
+| **Strategy Agent** | [`skills/agents/strategy-agent/SKILL.md`](../agents/strategy-agent/SKILL.md) | Filter jobs by relevance, blocklist, seniority, session budget |
 | **Automation Agent** | [`skills/agents/automation-agent/SKILL.md`](../agents/automation-agent/SKILL.md) | Timing, retry logic, rate limiting, anti-detection |
 | **Web Structure Agent** | [`skills/agents/web-structure-agent/SKILL.md`](../agents/web-structure-agent/SKILL.md) | Broken selectors, LinkedIn DOM changes, lazy loading |
 | **QA Agent** | [`skills/agents/qa-agent/SKILL.md`](../agents/qa-agent/SKILL.md) | Verify submissions, validate results, session reports |
 
-### Recommended Run Order
+### Orchestrated Run Order
 
 ```
-1. QA Agent      → preFlightCheck(page)          # verify session is healthy
-2. [run automation]
-3. QA Agent      → verifyApplicationSuccess()    # after each submit
-4. QA Agent      → generateReport()              # end-of-session summary
+1. QA Agent       → preFlightCheck(page)         # must PASS — abort if it fails
+2. Strategy Agent → filterJobs(jobs, prefs)       # score & filter before applying
+3. [run automation with filtered job list]
+   └─ per-job: QA Agent → verifyApplicationSuccess()
+4. QA Agent       → generateReport()             # end-of-session PASS/WARN/FAIL
 ```
 
-If issues arise mid-run:
-- Selectors return 0 results → invoke **Web Structure Agent**
-- High failure rate / detected → invoke **Automation Agent**
-- Unsure if applications went through → invoke **QA Agent**
+Escalation during run:
+- Selectors return 0 results → **Web Structure Agent** (selector update)
+- High failure rate or detected → **Automation Agent** (timing / retry review)
+- Applying to irrelevant jobs → **Strategy Agent** (tighten filters)
+- Unsure if applications went through → **QA Agent** (verification)
+
+### userProfile — Configure Before Running
+
+Set personal values to avoid detectable generic placeholders:
+
+```javascript
+const userProfile = {
+  phone: '+1-555-000-0000',                         // your real phone
+  linkedinUrl: 'https://www.linkedin.com/in/yourhandle',
+  city: 'San Francisco',
+  zip: '94105',
+  yearsExp: 5
+};
+
+await autoApplyLinkedInJobs(page, {
+  targetApplications: 20,
+  searchKeywords: 'software engineer',
+  userProfile  // pass here
+});
+```
 
 ## When to Use This Skill
 

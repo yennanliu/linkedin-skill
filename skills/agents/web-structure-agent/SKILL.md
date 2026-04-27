@@ -129,8 +129,45 @@ Always prefer selectors in this order (most to least stable):
 'span[aria-hidden="true"]'  // Inside the anchor tag
 'a.app-aware-link'
 
-// Profile URL
-'a[href*="/in/"]'
+// Profile URL (used in scrapeLinkedInProfiles.js)
+'a[href*="/in/"][data-control-name="search_srp_result"]'  // Most specific
+'.entity-result__title-text a'                             // Fallback
+'a[href*="linkedin.com/in/"]'                             // Broad fallback
+```
+
+#### LinkedIn People Search URL & URN Filters
+
+LinkedIn's people search supports structured filter parameters, but they require internal URN IDs — not plain text names.
+
+**Plain keyword approach** (what the scraper currently uses — unreliable as structured filter):
+```
+/search/results/people/?keywords=Google+United+States+Software+Development
+```
+
+**Structured URL approach** (reliable, requires URN IDs):
+```
+/search/results/people/?keywords=engineer
+  &facetCurrentCompany=["1441"]      ← Google's company URN
+  &facetGeoRegion=["103644278"]      ← United States geo URN
+  &facetIndustry=["96"]              ← Software Development industry URN
+```
+
+**How to get URNs without the API:**
+1. Open LinkedIn People search in browser
+2. Apply filters using the UI (company, location, industry dropdowns)
+3. Copy the URL from the address bar — it contains the URN IDs
+4. Use that URL directly in the scraper
+
+**Recency filter** (no URN needed):
+```
+&f_TPR=r86400    ← last 24 hours
+&f_TPR=r259200   ← last 3 days
+&f_TPR=r604800   ← last week
+```
+
+**Easy Apply filter** (for job search only):
+```
+&f_AL=true
 ```
 
 ## Resilient Selector Patterns

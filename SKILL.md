@@ -56,19 +56,22 @@ Both skills are backed by three specialist agents for deeper control:
 
 | Agent | Skill Name | Purpose |
 |-------|-----------|---------|
+| **Strategy Agent** | `linkedin-strategy-agent` | Filter & score jobs, blocklist, seniority matching, session budget |
 | **Automation Agent** | `linkedin-automation-agent` | Timing, retry logic, rate limiting, anti-detection patterns |
 | **Web Structure Agent** | `linkedin-web-structure-agent` | LinkedIn DOM selectors, lazy loading, resilient element targeting |
 | **QA Agent** | `linkedin-qa-agent` | Pre-flight checks, result verification, data quality reports |
 
 Full agent docs: [`skills/agents/`](./skills/agents/)
 
-**Typical run flow:**
+**Orchestrated run flow:**
 ```
-1. QA Agent      → preFlightCheck(page)       # before starting
-2. [run skill]
-3. QA Agent      → verify / generateReport()  # after finishing
-   ↓ if selectors broken → Web Structure Agent
-   ↓ if high failure rate → Automation Agent
+1. QA Agent       → preFlightCheck(page)        # must PASS — abort if fails
+2. Strategy Agent → filterJobs(jobs, prefs)      # score & filter before applying
+3. [run skill with filtered list]
+4. QA Agent       → verify / generateReport()   # after finishing
+   ↓ selectors broken    → Web Structure Agent
+   ↓ high failure rate   → Automation Agent
+   ↓ irrelevant matches  → Strategy Agent
 ```
 
 ---

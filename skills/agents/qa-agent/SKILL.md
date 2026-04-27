@@ -25,9 +25,17 @@ Run before any automation session:
 async function preFlightCheck(page) {
   const results = { passed: [], failed: [], warnings: [] };
   
-  // 1. Login check
-  const isLoggedIn = !page.url().includes('/login') &&
-    await page.locator('.global-nav__me-photo').count() > 0;
+  // 1. Login check — prefer URL and feed-page signals over class names,
+  //    since LinkedIn has historically renamed .global-nav__me-photo
+  const url = page.url();
+  const onCheckpoint = url.includes('/login') || url.includes('/checkpoint') || url.includes('/authwall');
+  const hasNavAvatar = await page.locator([
+    '[data-control-name="identity_profile_photo"]',
+    '.global-nav__me-photo',
+    'img.presence-entity__image',
+    'button[aria-label*="profile"]'
+  ].join(', ')).count() > 0;
+  const isLoggedIn = !onCheckpoint && hasNavAvatar;
   if (isLoggedIn) results.passed.push('Login: active session detected');
   else results.failed.push('Login: not logged in — stop and login first');
   

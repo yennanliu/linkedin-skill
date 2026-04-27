@@ -21,9 +21,25 @@
 /**
  * Fill all empty form fields in the Easy Apply modal with sensible defaults.
  * Handles: text/email/tel inputs, number inputs, native <select>, radio groups, textareas.
+ *
+ * @param {Page} page - Playwright page object
+ * @param {Object} userProfile - Optional personal values to use instead of placeholders
+ * @param {string} [userProfile.phone]       - Your real phone number
+ * @param {string} [userProfile.linkedinUrl] - Your LinkedIn profile URL
+ * @param {string} [userProfile.city]        - Your city / location
+ * @param {string} [userProfile.zip]         - Your ZIP / postal code
+ * @param {number} [userProfile.yearsExp]    - Years of experience to fill in numeric fields
  */
-async function fillFormDefaults(page) {
-  await page.evaluate(() => {
+async function fillFormDefaults(page, userProfile = {}) {
+  const profile = {
+    phone: userProfile.phone || '0000000000',
+    linkedinUrl: userProfile.linkedinUrl || 'https://www.linkedin.com/in/me',
+    city: userProfile.city || 'Remote',
+    zip: userProfile.zip || '00000',
+    yearsExp: userProfile.yearsExp || 3,
+  };
+
+  await page.evaluate((p) => {
     const modal = document.querySelector('[role="dialog"], .jobs-easy-apply-modal');
     if (!modal) return;
 
@@ -45,13 +61,13 @@ async function fillFormDefaults(page) {
       if (input.value.trim()) return;
       const label = getLabel(input);
       if (label.includes('phone') || label.includes('tel') || label.includes('mobile')) {
-        input.value = '0000000000';
+        input.value = p.phone;
       } else if (label.includes('linkedin') || label.includes('url') || label.includes('website')) {
-        input.value = 'https://www.linkedin.com/in/me';
+        input.value = p.linkedinUrl;
       } else if (label.includes('city') || label.includes('address')) {
-        input.value = 'Remote';
+        input.value = p.city;
       } else if (label.includes('zip') || label.includes('postal')) {
-        input.value = '00000';
+        input.value = p.zip;
       } else {
         input.value = 'N/A';
       }
@@ -63,7 +79,7 @@ async function fillFormDefaults(page) {
       if (input.value.trim()) return;
       const label = getLabel(input);
       if (label.includes('year') || label.includes('experience') || label.includes('exp')) {
-        input.value = '3';
+        input.value = String(p.yearsExp);
       } else if (label.includes('salary') || label.includes('rate') || label.includes('compensation')) {
         input.value = '0';
       } else {
@@ -111,7 +127,7 @@ async function fillFormDefaults(page) {
         dispatch(ta);
       }
     });
-  });
+  }, profile);
 
   // Let React re-render after field changes
   await page.waitForTimeout(500);
@@ -162,9 +178,10 @@ async function listJobs(page) {
  * Fills questionnaire fields with defaults rather than skipping.
  * @param {Page} page - Playwright page object
  * @param {number} jobIndex - 0-based index from listJobs()
+ * @param {Object} [userProfile] - Personal values for form filling (see fillFormDefaults)
  * @returns {Promise<Object>} Result: { status, reason?, job }
  */
-async function applySingleJob(page, jobIndex) {
+async function applySingleJob(page, jobIndex, userProfile = {}) {
   console.log(`\n🔍 Applying to job at index ${jobIndex}...`);
 
   try {
@@ -256,7 +273,7 @@ async function applySingleJob(page, jobIndex) {
     const maxSteps = 10;
     for (let step = 1; step <= maxSteps; step++) {
       // Fill any empty form fields before checking buttons
-      await fillFormDefaults(page);
+      await fillFormDefaults(page, userProfile);
 
       const hasSubmit = await page.evaluate(() =>
         !!Array.from(document.querySelectorAll('button')).find(b =>

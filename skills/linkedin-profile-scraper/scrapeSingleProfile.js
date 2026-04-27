@@ -21,11 +21,18 @@ async function scrapeSingleProfile(page, profileUrl) {
     await page.goto(profileUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForTimeout(2500);
 
-    // Scroll to trigger lazy-loaded sections
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
-    await page.waitForTimeout(1000);
+    // Scroll to trigger lazy-loaded sections.
+    // Scroll #experience anchor into view (not just the window) so LinkedIn
+    // mounts the virtualized experience content before we extract it.
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 3));
+    await page.waitForTimeout(600);
+    const expAnchor = page.locator('#experience');
+    if (await expAnchor.count() > 0) {
+      await expAnchor.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(900);
+    }
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(1000);
 
     const profile = await page.evaluate(() => {
       const text = (el) => el ? el.textContent.trim() : null;
