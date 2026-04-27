@@ -28,19 +28,24 @@ git add .github/copilot-instructions.md && git commit -m "Add LinkedIn auto-appl
 
 Open Copilot Chat in your editor and ask:
 
+### 1. Job Auto-Apply
 ```
 Help me apply to LinkedIn jobs automatically
 ```
 
-or
-
+### 2. Profile Scraper
 ```
-Show me how to run the LinkedIn auto-apply batch automation
+Scrape 20 LinkedIn profiles at Google in the United States
+```
+
+### 3. Contact Discovery
+```
+Discover 10 contacts at Google for a referral and generate emails
 ```
 
 Copilot will reference the skill documentation and guide you to:
-1. Paste `applySingleJob.js` functions into a Playwright block (test)
-2. Run `autoApplyLinkedInJobs()` for batch automation
+1. Paste the appropriate JS functions into a Playwright block
+2. Run the automation in your browser
 
 ## Run the Automation
 

@@ -486,6 +486,54 @@ Apply to 25 remote jobs on LinkedIn
 
 ---
 
+## Profile Scraper Examples
+
+### Example 22: Scrape Competitor Employees
+Find employees at a specific company.
+
+**Command:**
+```
+Scrape 20 profiles of Software Engineers at Google in the United States
+```
+
+### Example 23: Industry Research
+Scrape profiles in a specific industry.
+
+**Command:**
+```
+Scrape 15 profiles in the "Software Development" industry in London
+```
+
+---
+
+## Contact Reacher Examples (Networking)
+
+### Example 24: Referral Discovery
+Discover contacts for a referral at a target company.
+
+**Command:**
+```
+Discover 10 contacts at Google for a referral and generate their email addresses
+```
+
+### Example 25: Networking Traversal
+Use BFS to find contacts related to a seed profile.
+
+**Command:**
+```
+Start from https://www.linkedin.com/in/some-profile/ and discover 20 related contacts at Stripe
+```
+
+### Example 26: Outreach with Connection Requests
+Discover and reach out.
+
+**Command:**
+```
+Discover 5 engineering managers at Meta and send them a connection request for a referral
+```
+
+---
+
 ## Tips for Success
 
 1. **Always test first**: Run a single job test before batch processing
