@@ -26,7 +26,8 @@
                 <div class="nav-links">
                     <a href="#skills">Skills</a>
                     <a href="#features">Features</a>
-                    <a href="#installation">Get Started</a>
+                    <a href="#quickstart">Quick Start</a>
+                    <a href="#installation">Install</a>
                     <a href="#docs">Docs</a>
                     <a href="index-zh-TW.html" style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.12);border-radius:20px;padding:4px 12px;font-size:13px;font-weight:500;text-decoration:none;color:#444;">🌐 繁體中文</a>
                     <a href="https://github.com/yennanliu/linkedin-skill" target="_blank" class="btn-github">
@@ -82,8 +83,8 @@
                         <div class="stat-label">Auto-Apply &amp; Scraper</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">Smart</div>
-                        <div class="stat-label">Filter &amp; Skip Logic</div>
+                        <div class="stat-number">4 Agents</div>
+                        <div class="stat-label">Strategy · Auto · DOM · QA</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-number">Safe</div>
@@ -132,13 +133,25 @@
                 <div class="feature-card">
                     <div class="feature-icon">⚡</div>
                     <h3>Lightning Fast Apply</h3>
-                    <p>Apply to 20-50 Easy Apply jobs automatically. Batch process multiple pages with target-based stopping.</p>
+                    <p>Apply to 20-50 Easy Apply jobs automatically. Batch process multiple pages with target-based stopping and cross-page deduplication.</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">🗂️</div>
                     <h3>Profile Scraping</h3>
                     <p>Scrape structured profile data filtered by company, country, and industry. Returns JSON with full work history.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>4 Specialist Agents</h3>
+                    <p><strong>Strategy</strong> scores &amp; filters jobs. <strong>Automation</strong> handles timing &amp; retries. <strong>Web Structure</strong> maintains DOM selectors. <strong>QA</strong> verifies every result.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Smart Job Scoring</h3>
+                    <p>Strategy Agent scores jobs by title relevance, seniority match, remote status, and company blocklist before any application is sent.</p>
                 </div>
 
                 <div class="feature-card">
@@ -150,19 +163,59 @@
                 <div class="feature-card">
                     <div class="feature-icon">🛡️</div>
                     <h3>Safe & Secure</h3>
-                    <p>Built-in delays (2-4 seconds), error handling, and rate limiting. Respects LinkedIn's terms.</p>
+                    <p>Built-in randomized delays, retry logic, session limits, and rate-limit detection. Configurable <code>userProfile</code> avoids detectable placeholder values.</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">📊</div>
-                    <h3>On-Page Status</h3>
-                    <p>Visual progress indicator shows applications count, current page, and automation state.</p>
+                    <h3>QA Reports</h3>
+                    <p>Pre-flight check before each session. Per-application success verification. End-of-session PASS/WARN/FAIL report with completeness scoring.</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">🔍</div>
-                    <h3>Smart Filtering</h3>
-                    <p>Automatically skips already-applied jobs and non-Easy Apply positions. Scraper filters by company/country/industry.</p>
+                    <h3>Resilient Selectors</h3>
+                    <p>Web Structure Agent provides multi-fallback selectors prioritising stable <code>aria-*</code> and <code>data-*</code> attributes over fragile class names.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Agents Section -->
+    <section id="agents" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Four Specialist Agents</h2>
+                <p class="section-subtitle">Modular expertise — invoke the right agent for the right problem</p>
+            </div>
+
+            <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                <div class="feature-card" style="border-top: 4px solid #0A66C2;">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Strategy Agent</h3>
+                    <p>Scores and filters jobs before automation runs. Supports title matching, seniority level, remote-only filter, company blocklist/allowlist, and daily application budget planning.</p>
+                    <p style="margin-top:0.75rem;font-size:0.85rem;color:#666;"><code>linkedin-strategy-agent</code></p>
+                </div>
+
+                <div class="feature-card" style="border-top: 4px solid #057642;">
+                    <div class="feature-icon">⚙️</div>
+                    <h3>Automation Agent</h3>
+                    <p>Advises on timing strategy, retry wrappers, session health checks, rate-limit back-off, and anti-detection best practices. Keeps automation running reliably.</p>
+                    <p style="margin-top:0.75rem;font-size:0.85rem;color:#666;"><code>linkedin-automation-agent</code></p>
+                </div>
+
+                <div class="feature-card" style="border-top: 4px solid #8B5CF6;">
+                    <div class="feature-icon">🔬</div>
+                    <h3>Web Structure Agent</h3>
+                    <p>LinkedIn DOM specialist. Provides resilient selectors, explains lazy loading and virtual scroll behaviour, and runs selector health checks when LinkedIn updates its UI.</p>
+                    <p style="margin-top:0.75rem;font-size:0.85rem;color:#666;"><code>linkedin-web-structure-agent</code></p>
+                </div>
+
+                <div class="feature-card" style="border-top: 4px solid #DC2626;">
+                    <div class="feature-icon">✅</div>
+                    <h3>QA Agent</h3>
+                    <p>Pre-flight checks before each session. Verifies each application was genuinely submitted. Validates scraped profile completeness. Generates PASS/WARN/FAIL session reports.</p>
+                    <p style="margin-top:0.75rem;font-size:0.85rem;color:#666;"><code>linkedin-qa-agent</code></p>
                 </div>
             </div>
         </div>
@@ -209,6 +262,62 @@
                         <p>Watch as Easy Apply jobs are processed automatically with real-time status</p>
                         <div class="code-snippet">
                             <code>✅ 20/20 applications submitted successfully!</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Start Section -->
+    <section id="quickstart" class="how-it-works" style="background:#f8fafc;">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Quick Start</h2>
+                <p class="section-subtitle">From install to first application in under 2 minutes</p>
+            </div>
+
+            <div class="steps">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Pre-flight Check</h3>
+                        <p>QA Agent verifies your session is healthy before anything runs</p>
+                        <div class="code-snippet">
+                            <code>// Paste qa-agent preFlightCheck, then:<br>const check = await preFlightCheck(page);<br>// Must show: ✅ Login · ✅ Network · ✅ No CAPTCHA</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Configure &amp; Filter</h3>
+                        <p>Set your personal profile and let the Strategy Agent score jobs before applying</p>
+                        <div class="code-snippet">
+                            <code>const prefs = {<br>&nbsp;&nbsp;targetTitles: ['software engineer'],<br>&nbsp;&nbsp;seniorityLevel: 'mid',<br>&nbsp;&nbsp;mustBeRemote: false,<br>&nbsp;&nbsp;blockedCompanies: ['Staffing Co']<br>};<br>const { toApply } = filterJobs(jobs, prefs);</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Run &amp; Verify</h3>
+                        <p>Automation applies to scored jobs; QA Agent confirms each submission</p>
+                        <div class="code-snippet">
+                            <code>await autoApplyLinkedInJobs(page, {<br>&nbsp;&nbsp;targetApplications: 20,<br>&nbsp;&nbsp;userProfile: {<br>&nbsp;&nbsp;&nbsp;&nbsp;phone: '+1-555-000-0000',<br>&nbsp;&nbsp;&nbsp;&nbsp;linkedinUrl: 'https://linkedin.com/in/you',<br>&nbsp;&nbsp;&nbsp;&nbsp;yearsExp: 5<br>&nbsp;&nbsp;}<br>});</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Review Report</h3>
+                        <p>QA Agent generates a structured PASS/WARN/FAIL session summary</p>
+                        <div class="code-snippet">
+                            <code>// Example output:<br>// ✅ PASS — 18/20 successful (90%)<br>// ⚠️  2 low-confidence verifications<br>// ⏱  Session: 312s</code>
                         </div>
                     </div>
                 </div>
@@ -341,6 +450,13 @@
                     <p>Detailed setup instructions for Claude Code, Gemini CLI, and GitHub Copilot</p>
                     <span class="doc-link">Read Guide →</span>
                 </a>
+
+                <a href="https://github.com/yennanliu/linkedin-skill/tree/main/skills/agents" class="doc-card" target="_blank">
+                    <div class="doc-icon">🤖</div>
+                    <h3>Specialist Agents</h3>
+                    <p>Strategy, Automation, Web Structure, and QA agent skill files — each with runnable code snippets</p>
+                    <span class="doc-link">Browse Agents →</span>
+                </a>
             </div>
         </div>
     </section>
@@ -396,6 +512,26 @@
                 <details class="faq-item">
                     <summary>Does the Profile Scraper work with free LinkedIn accounts?</summary>
                     <p>Yes, but free accounts have limited search results (usually up to 100 people search results per month). LinkedIn Premium or Sales Navigator increases limits significantly.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>What are the specialist agents and when should I use them?</summary>
+                    <p>Four agents support both skills: <strong>Strategy Agent</strong> scores and filters jobs before applying; <strong>Automation Agent</strong> advises on timing, retries, and anti-detection; <strong>Web Structure Agent</strong> provides updated LinkedIn selectors when the UI changes; <strong>QA Agent</strong> runs pre-flight checks and verifies results. Invoke whichever agent matches the problem you're debugging.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>What is userProfile and why should I set it?</summary>
+                    <p><code>userProfile</code> is a config object you pass to <code>autoApplyLinkedInJobs</code>. It contains your real phone, LinkedIn URL, city, ZIP, and years of experience. Without it, the automation fills forms with obvious placeholders like <code>0000000000</code>, which may be flagged by LinkedIn's fraud detection. Setting real values makes applications look genuine.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>How does the Strategy Agent decide which jobs to apply to?</summary>
+                    <p>It scores each job 0–100 based on: title keyword match (0–40 pts), seniority level match (0–30 pts), and remote status (0–20 pts). Jobs with a score below <code>minScore</code> (default 50) are skipped. You can also set a <code>blockedCompanies</code> list for hard skips or an <code>allowedCompanies</code> list to restrict to specific employers.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>What does the QA pre-flight check verify?</summary>
+                    <p>It checks four things before any session starts: (1) LinkedIn session is active — not on a login or checkpoint page; (2) network is stable; (3) no CAPTCHA is visible; (4) no rate-limit message is showing. If any check fails, the session should not proceed.</p>
                 </details>
             </div>
         </div>

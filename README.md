@@ -15,6 +15,27 @@ Two Claude Code skills for LinkedIn automation using Playwright MCP tools.
 | Job Auto-Apply | `/linkedin-job-auto-apply` | Apply to Easy Apply jobs in batch |
 | Profile Scraper | `/linkedin-profile-scraper` | Scrape profiles by company/country/industry |
 
+## Specialized Agents
+
+Four agents back both skills with deeper expertise on demand:
+
+| Agent | Skill Name | Purpose |
+|-------|-----------|---------|
+| **Strategy Agent** | `linkedin-strategy-agent` | Score & filter jobs by relevance, seniority, blocklist; plan session budget |
+| **Automation Agent** | `linkedin-automation-agent` | Timing, retry logic, rate limiting, anti-detection patterns |
+| **Web Structure Agent** | `linkedin-web-structure-agent` | LinkedIn DOM selectors, lazy loading, virtual scroll, resilient targeting |
+| **QA Agent** | `linkedin-qa-agent` | Pre-flight checks, result verification, data quality reports |
+
+**Orchestrated run flow:**
+```
+1. QA Agent       → preFlightCheck(page)        # must PASS — abort if fails
+2. Strategy Agent → filterJobs(jobs, prefs)      # score & filter before applying
+3. [run skill]
+4. QA Agent       → generateReport()            # PASS / WARN / FAIL
+```
+
+Agent docs: [`skills/agents/`](./skills/agents/)
+
 ---
 
 ## Skill 1: Job Auto-Apply
@@ -27,9 +48,10 @@ Automate LinkedIn Easy Apply job applications.
 - **Target-Based**: Stop automatically after N successful applications
 - **Keyboard Controls**: Pause (P), Resume (R), Quit (Q) anytime
 - **On-Page Status**: Visual progress indicator
-- **Smart Filtering**: Skip already applied and non-Easy Apply jobs
+- **Smart Filtering**: Skip already applied, non-Easy Apply, and duplicate jobs across pages
 - **Human-Like Delays**: Random delays to avoid detection
 - **Comprehensive Error Handling**: Continues even when some jobs fail
+- **Agent System**: Strategy, Automation, Web Structure, and QA agents for reliability
 
 ### Configuration
 
@@ -38,11 +60,33 @@ Automate LinkedIn Easy Apply job applications.
 | `startPage` | 1 | Starting page number |
 | `targetApplications` | 20 | Target number of successful applications |
 | `maxPages` | 20 | Maximum pages to process |
-| `searchKeywords` | 'software engineer' | Job search keywords |
-| `location` | 'United States' | Job location |
-| `easyApplyOnly` | true | Only apply to Easy Apply jobs |
-| `delayMin` | 2000 | Minimum delay between jobs (ms) |
-| `delayMax` | 4000 | Maximum delay between jobs (ms) |
+| `searchKeywords` | `'software engineer'` | Job search keywords |
+| `location` | `'United States'` | Job location |
+| `delayMin` | 3000 | Minimum delay between jobs (ms) |
+| `delayMax` | 5000 | Maximum delay between jobs (ms) |
+| `userProfile.phone` | `'0000000000'` | Your phone number for form filling |
+| `userProfile.linkedinUrl` | `'...'` | Your LinkedIn URL for form filling |
+| `userProfile.city` | `'Remote'` | Your city for form filling |
+| `userProfile.zip` | `'00000'` | Your ZIP code for form filling |
+| `userProfile.yearsExp` | `3` | Years of experience for numeric fields |
+
+### Quick Start
+
+```javascript
+await autoApplyLinkedInJobs(page, {
+  targetApplications: 20,
+  searchKeywords: 'software engineer',
+  location: 'United States',
+  userProfile: {
+    phone: '+1-555-000-0000',
+    linkedinUrl: 'https://www.linkedin.com/in/yourhandle',
+    city: 'San Francisco',
+    zip: '94105',
+    yearsExp: 5
+  }
+});
+// Keyboard: P=Pause  R=Resume  Q=Quit
+```
 
 ### Usage Examples
 

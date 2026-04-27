@@ -45,7 +45,8 @@
                 <div class="nav-links">
                     <a href="#skills">技能</a>
                     <a href="#features">功能</a>
-                    <a href="#installation">開始使用</a>
+                    <a href="#quickstart">快速開始</a>
+                    <a href="#installation">安裝</a>
                     <a href="#docs">文件</a>
                     <a href="index.html" class="lang-switcher">🌐 English</a>
                     <a href="https://github.com/yennanliu/linkedin-skill" target="_blank" class="btn-github">
@@ -101,8 +102,8 @@
                         <div class="stat-label">自動投遞 &amp; 資料爬取</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">智慧</div>
-                        <div class="stat-label">過濾與略過邏輯</div>
+                        <div class="stat-number">4 個代理人</div>
+                        <div class="stat-label">策略 · 自動化 · DOM · QA</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-number">安全</div>
@@ -151,13 +152,25 @@
                 <div class="feature-card">
                     <div class="feature-icon">⚡</div>
                     <h3>高速批次投遞</h3>
-                    <p>自動投遞 20–50 份 Easy Apply 職缺，批次處理多頁搜尋結果，達到目標數量後自動停止。</p>
+                    <p>自動投遞 20–50 份 Easy Apply 職缺，批次處理多頁搜尋結果，跨頁去重，達到目標數量後自動停止。</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">🗂️</div>
                     <h3>個人檔案爬取</h3>
                     <p>依公司、國家、產業爬取結構化個人檔案，回傳包含完整工作經歷的 JSON 資料。</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>4 個專業代理人</h3>
+                    <p><strong>策略</strong>代理人評分篩選職缺；<strong>自動化</strong>代理人處理時序與重試；<strong>網頁結構</strong>代理人維護 DOM 選擇器；<strong>品質保證</strong>代理人驗證每次結果。</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>智慧職缺評分</h3>
+                    <p>策略代理人在送出申請前，依職稱相關性、資歷層級、遠端狀態與公司黑名單為每份職缺評分。</p>
                 </div>
 
                 <div class="feature-card">
@@ -169,19 +182,59 @@
                 <div class="feature-card">
                     <div class="feature-icon">🛡️</div>
                     <h3>安全可靠</h3>
-                    <p>內建延遲（2–4 秒）、錯誤處理與速率限制，在合理範圍內使用 LinkedIn。</p>
+                    <p>內建隨機化延遲、重試邏輯、會話限制與速率限制偵測。可設定 <code>userProfile</code> 避免使用易被偵測的預設值。</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">📊</div>
-                    <h3>頁面狀態顯示</h3>
-                    <p>浮動進度視窗即時顯示申請數量、目前頁碼與自動化狀態。</p>
+                    <h3>品質保證報告</h3>
+                    <p>每次會話前執行啟動前檢查，逐一驗證每份申請是否成功送出，並於結束時產生通過／警告／失敗報告。</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">🔍</div>
-                    <h3>智慧過濾</h3>
-                    <p>自動略過已申請及非 Easy Apply 職缺；爬取器依公司／國家／產業精準篩選。</p>
+                    <h3>穩健選擇器</h3>
+                    <p>網頁結構代理人提供多重備用選擇器，優先使用穩定的 <code>aria-*</code> 與 <code>data-*</code> 屬性，不依賴易變的 class 名稱。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Agents Section -->
+    <section id="agents" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">四個專業代理人</h2>
+                <p class="section-subtitle">模組化專業能力 — 依問題類型呼叫對應代理人</p>
+            </div>
+
+            <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                <div class="feature-card" style="border-top: 4px solid #0A66C2;">
+                    <div class="feature-icon">🎯</div>
+                    <h3>策略代理人</h3>
+                    <p>在自動化執行前評分篩選職缺。支援職稱比對、資歷層級、僅限遠端、公司黑名單／白名單，以及每日申請配額規劃。</p>
+                    <p style="margin-top:0.75rem;font-size:0.85rem;color:#666;"><code>linkedin-strategy-agent</code></p>
+                </div>
+
+                <div class="feature-card" style="border-top: 4px solid #057642;">
+                    <div class="feature-icon">⚙️</div>
+                    <h3>自動化代理人</h3>
+                    <p>提供時序策略、重試包裝器、會話健康檢查、速率限制退避，以及防偵測最佳實踐建議，確保自動化穩定運行。</p>
+                    <p style="margin-top:0.75rem;font-size:0.85rem;color:#666;"><code>linkedin-automation-agent</code></p>
+                </div>
+
+                <div class="feature-card" style="border-top: 4px solid #8B5CF6;">
+                    <div class="feature-icon">🔬</div>
+                    <h3>網頁結構代理人</h3>
+                    <p>LinkedIn DOM 專家。提供穩健選擇器，說明延遲載入與虛擬捲動機制，並在 LinkedIn 更新介面時執行選擇器健康檢查。</p>
+                    <p style="margin-top:0.75rem;font-size:0.85rem;color:#666;"><code>linkedin-web-structure-agent</code></p>
+                </div>
+
+                <div class="feature-card" style="border-top: 4px solid #DC2626;">
+                    <div class="feature-icon">✅</div>
+                    <h3>品質保證代理人</h3>
+                    <p>每次會話前執行啟動前檢查，驗證每份申請是否確實送出，評估爬取個人檔案的完整性，並產生通過／警告／失敗會話報告。</p>
+                    <p style="margin-top:0.75rem;font-size:0.85rem;color:#666;"><code>linkedin-qa-agent</code></p>
                 </div>
             </div>
         </div>
@@ -228,6 +281,62 @@
                         <p>觀看 Easy Apply 職缺自動處理，並即時查看狀態</p>
                         <div class="code-snippet">
                             <code>✅ 20/20 份申請已成功送出！</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Start Section -->
+    <section id="quickstart" class="how-it-works" style="background:#f8fafc;">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">快速開始</h2>
+                <p class="section-subtitle">從安裝到第一份申請，不到 2 分鐘</p>
+            </div>
+
+            <div class="steps">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>啟動前檢查</h3>
+                        <p>品質保證代理人在執行前驗證會話狀態是否正常</p>
+                        <div class="code-snippet">
+                            <code>// 貼上 qa-agent preFlightCheck 後執行：<br>const check = await preFlightCheck(page);<br>// 必須顯示：✅ 登入 · ✅ 網路 · ✅ 無驗證碼</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>設定與篩選</h3>
+                        <p>設定個人資料，讓策略代理人在申請前為職缺評分篩選</p>
+                        <div class="code-snippet">
+                            <code>const prefs = {<br>&nbsp;&nbsp;targetTitles: ['software engineer'],<br>&nbsp;&nbsp;seniorityLevel: 'mid',<br>&nbsp;&nbsp;mustBeRemote: false,<br>&nbsp;&nbsp;blockedCompanies: ['人力仲介公司']<br>};<br>const { toApply } = filterJobs(jobs, prefs);</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>執行並驗證</h3>
+                        <p>自動化投遞評分通過的職缺；品質保證代理人確認每次申請</p>
+                        <div class="code-snippet">
+                            <code>await autoApplyLinkedInJobs(page, {<br>&nbsp;&nbsp;targetApplications: 20,<br>&nbsp;&nbsp;userProfile: {<br>&nbsp;&nbsp;&nbsp;&nbsp;phone: '+886-912-345-678',<br>&nbsp;&nbsp;&nbsp;&nbsp;linkedinUrl: 'https://linkedin.com/in/you',<br>&nbsp;&nbsp;&nbsp;&nbsp;yearsExp: 5<br>&nbsp;&nbsp;}<br>});</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>查看報告</h3>
+                        <p>品質保證代理人產生結構化的通過／警告／失敗會話摘要</p>
+                        <div class="code-snippet">
+                            <code>// 輸出範例：<br>// ✅ 通過 — 18/20 成功（90%）<br>// ⚠️  2 筆低信心驗證<br>// ⏱  會話時長：312 秒</code>
                         </div>
                     </div>
                 </div>
@@ -360,6 +469,13 @@
                     <p>Claude Code、Gemini CLI 與 GitHub Copilot 的詳細安裝說明</p>
                     <span class="doc-link">閱讀指南 →</span>
                 </a>
+
+                <a href="https://github.com/yennanliu/linkedin-skill/tree/main/skills/agents" class="doc-card" target="_blank">
+                    <div class="doc-icon">🤖</div>
+                    <h3>專業代理人</h3>
+                    <p>策略、自動化、網頁結構、品質保證四大代理人技能文件，每份均含可執行程式碼片段</p>
+                    <span class="doc-link">瀏覽代理人 →</span>
+                </a>
             </div>
         </div>
     </section>
@@ -420,6 +536,26 @@
                 <details class="faq-item">
                     <summary>免費 LinkedIn 帳號也可以使用個人檔案爬取器嗎？</summary>
                     <p>可以，但免費帳號的人才搜尋結果有限（通常每月最多 100 筆）。LinkedIn 高級會員或 Sales Navigator 可大幅提升搜尋上限。</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>四個專業代理人各自的功能與使用時機為何？</summary>
+                    <p>四個代理人分別支援兩項技能：<strong>策略代理人</strong>在申請前評分篩選職缺；<strong>自動化代理人</strong>提供時序、重試與防偵測建議；<strong>網頁結構代理人</strong>在 LinkedIn 更新介面時提供最新選擇器；<strong>品質保證代理人</strong>執行啟動前檢查並驗證結果。依問題類型呼叫對應代理人即可。</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>什麼是 userProfile，為什麼要設定它？</summary>
+                    <p><code>userProfile</code> 是傳入 <code>autoApplyLinkedInJobs</code> 的設定物件，包含您的真實電話、LinkedIn 網址、城市、郵遞區號和年資。若未設定，系統會填入 <code>0000000000</code> 等明顯的預設值，可能被 LinkedIn 的詐欺偵測系統標記。填入真實資料可讓申請看起來更自然。</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>策略代理人如何決定哪些職缺值得申請？</summary>
+                    <p>它以 0–100 分為每份職缺評分：職稱關鍵字比對（0–40 分）、資歷層級比對（0–30 分）、遠端狀態（0–20 分）。低於 <code>minScore</code>（預設 50）的職缺會被略過。您也可以設定 <code>blockedCompanies</code> 黑名單強制略過，或設定 <code>allowedCompanies</code> 白名單僅申請特定公司。</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>品質保證代理人的啟動前檢查會確認哪些項目？</summary>
+                    <p>執行前會確認四個項目：（1）LinkedIn 會話為有效登入狀態（非登入或檢查點頁面）；（2）網路連線穩定；（3）頁面未顯示驗證碼；（4）未出現速率限制訊息。任一項目未通過，應中止本次會話。</p>
                 </details>
             </div>
         </div>
