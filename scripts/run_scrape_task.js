@@ -3,7 +3,7 @@ const { scrapeLinkedInProfiles } = require('./skills/linkedin-profile-scraper/sc
 const fs = require('fs');
 
 (async () => {
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({ headless: true });
   const storageState = 'cookies.json';
   
   if (!fs.existsSync(storageState)) {
