@@ -132,30 +132,36 @@ async function scrapeLinkedInProfiles(page, options = {}) {
           return { _authWall: true, profileUrl: currentUrl };
         }
 
-        // Basic info - Headline is typically the next significant block after the name
-        let headline = null;
-        if (nameEl) {
-            // Traverse up to a common parent and look for the next p or div
-            const headerArea = nameEl.closest('div');
-            if (headerArea) {
-                const nextP = headerArea.parentElement.querySelector('.text-body-medium');
-                headline = nextP ? nextP.textContent.trim() : null;
-            }
-        }
+        // Basic info
+        const main = document.querySelector('main [role="main"]') || document.querySelector('main');
+        const nameEl = main ? (main.querySelector('h1') || main.querySelector('h2')) : null;
+        let name = nameEl ? nameEl.textContent.trim() : null;
         
-        if (!headline || headline.startsWith('·')) {
-            headline = first('.text-body-medium') || first('[data-field="headline"]');
+        // Sanity check: if it looks like a UI label, it's probably not the name
+        if (name && (name.toLowerCase().includes('notification') || name.length > 50)) {
+          name = first('h1') || first('h2');
         }
 
-        const location =
-          first('.text-body-small.inline') ||
-          text(document.querySelector('[data-field="location"]'));
+        // Headline discovery - Look for significant text and split by degree marks
+        let headline = first('.text-body-medium') || first('[data-field="headline"]');
+        let location = first('.text-body-small.inline') || text(document.querySelector('[data-field="location"]'));
 
-        // Work history - More robust experience discovery
+        const blocks = main ? Array.from(main.querySelectorAll('p, div')) : [];
+        const headerBlock = blocks.find(b => {
+            const text = b.textContent.trim();
+            return text.length > 30 && text.includes('·');
+        });
+
+        if (headerBlock) {
+            const parts = headerBlock.textContent.split('·').map(p => p.trim());
+            const filteredParts = parts.filter(p => p !== name && !p.match(/^\d+(st|nd|rd|th)$/i));
+            if (!headline || headline.startsWith('·')) headline = filteredParts[0] || headline;
+            if (!location) location = filteredParts[2] || location;
+        }
+
+        // Work history - Filter out UI noise like 'notifications'
         const workHistory = [];
         let expContainer = null;
-        
-        // Search all sections for one containing "Experience" heading
         const sections = Array.from(document.querySelectorAll('section'));
         expContainer = sections.find(s => {
             const h = s.querySelector('h2, h3, span');
@@ -166,15 +172,17 @@ async function scrapeLinkedInProfiles(page, options = {}) {
           const items = expContainer.querySelectorAll('li');
           items.forEach((item) => {
             const spans = Array.from(item.querySelectorAll('span[aria-hidden="true"]'));
-            // Filter out short spans (like connection degree) and pick the first two long ones
-            const contentSpans = spans.filter(s => s.textContent.trim().length > 3);
+            const contentSpans = spans.filter(s => {
+                const t = s.textContent.trim();
+                return t.length > 3 && !t.toLowerCase().includes('notification') && !t.includes('connection');
+            });
             
             if (contentSpans.length >= 2) {
               const title = contentSpans[0].textContent.trim();
               const company = contentSpans[1].textContent.trim();
               const dateRange = spans.find(s => s.textContent.match(/\d{4}/))?.textContent.trim() || null;
               
-              if (title && !['Experience', 'Education', 'Skills'].includes(title)) {
+              if (title && !['Experience', 'Education', 'Skills', 'Interests'].includes(title)) {
                 workHistory.push({ title, company, dateRange });
               }
             }
