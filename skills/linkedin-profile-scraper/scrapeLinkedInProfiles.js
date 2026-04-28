@@ -126,10 +126,10 @@ async function scrapeLinkedInProfiles(page, options = {}) {
         const text = (el) => (el ? el.textContent.trim() : null);
         const first = (sel) => text(document.querySelector(sel));
 
-        // Basic info
-        const name = first('h1');
-        const headline = first('.text-body-medium.break-words');
-        const location = first('.text-body-small.inline.t-black--light.break-words');
+        // Basic info - Using more robust selectors
+        const name = first('h1.text-heading-xlarge') || first('h1') || first('.pv-top-card-section__name');
+        const headline = first('.text-body-medium.break-words') || first('.pv-top-card-section__headline');
+        const location = first('.text-body-small.inline.t-black--light.break-words') || first('.pv-top-card-section__location');
 
         // Work history from experience section
         const workHistory = [];

@@ -1,9 +1,9 @@
 const { chromium } = require('playwright');
-const { scrapeLinkedInProfiles } = require('./skills/linkedin-profile-scraper/scrapeLinkedInProfiles.js');
+const { scrapeLinkedInProfiles } = require('../skills/linkedin-profile-scraper/scrapeLinkedInProfiles.js');
 const fs = require('fs');
 
 (async () => {
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ headless: false });
   const storageState = 'cookies.json';
   
   if (!fs.existsSync(storageState)) {
@@ -15,10 +15,13 @@ const fs = require('fs');
   const page = await context.newPage();
 
   try {
+    console.log('🌐 Navigating to search page...');
     const results = await scrapeLinkedInProfiles(page, {
       company: 'Google',
       keywords: 'Product Manager',
-      maxProfiles: 10
+      maxProfiles: 10,
+      delayMin: 5000,
+      delayMax: 8000
     });
 
     console.log('\nFinal Results:');
