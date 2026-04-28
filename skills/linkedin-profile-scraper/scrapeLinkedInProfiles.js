@@ -126,24 +126,42 @@ async function scrapeLinkedInProfiles(page, options = {}) {
         const text = (el) => (el ? el.textContent.trim() : null);
         const first = (sel) => text(document.querySelector(sel));
 
-        // Basic info - Using more robust selectors
+        // Auth wall detection — if redirected to login, bail early
+        const currentUrl = window.location.href;
+        if (currentUrl.includes('/login') || currentUrl.includes('/checkpoint') || currentUrl.includes('/authwall')) {
+          return { _authWall: true, profileUrl: currentUrl };
+        }
+
+        // Basic info
         const name = first('h1.text-heading-xlarge') || first('h1') || first('.pv-top-card-section__name');
         const headline = first('.text-body-medium.break-words') || first('.pv-top-card-section__headline');
-        const location = first('.text-body-small.inline.t-black--light.break-words') || first('.pv-top-card-section__location');
+        const location =
+          first('.text-body-small.inline.t-black--light.break-words') ||
+          first('.pv-top-card-section__location') ||
+          first('.profile-topcard-person-entity__location');
 
         // Work history from experience section
         const workHistory = [];
         const expSection = document.querySelector('#experience');
 
         if (expSection) {
-          const parentSection = expSection.closest('section') || expSection.parentElement;
-          const items = parentSection
-            ? parentSection.querySelectorAll('li.artdeco-list__item')
+          // Try new pvs-list structure first (2024-2025), fall back to artdeco
+          const container =
+            expSection.closest('section') ||
+            expSection.parentElement;
+
+          const items = container
+            ? (container.querySelectorAll('li.pvs-list__paged-list-item').length > 0
+                ? container.querySelectorAll('li.pvs-list__paged-list-item')
+                : container.querySelectorAll('li.artdeco-list__item'))
             : [];
 
           items.forEach((item) => {
-            const spans = item.querySelectorAll('span[aria-hidden="true"]');
-            const boldEl = item.querySelector('.t-bold span[aria-hidden="true"], .mr1.t-bold span[aria-hidden="true"]');
+            const boldEl = item.querySelector(
+              '.t-bold span[aria-hidden="true"], ' +
+              '.mr1.t-bold span[aria-hidden="true"], ' +
+              '.pvs-entity__path-node span[aria-hidden="true"]'
+            );
             const normalEls = item.querySelectorAll('.t-14.t-normal span[aria-hidden="true"]');
             const lightEls = item.querySelectorAll('.t-14.t-normal.t-black--light span[aria-hidden="true"]');
 
@@ -179,8 +197,13 @@ async function scrapeLinkedInProfiles(page, options = {}) {
         };
       });
 
-      console.log(`   ✅ ${data.name || 'Unknown'} | ${data.currentCompany || '—'} | ${data.location || '—'}`);
-      profiles.push({ status: 'success', ...data });
+      if (data._authWall) {
+        console.log(`   ⚠️  Auth wall detected — LinkedIn requires login. URL: ${data.profileUrl}`);
+        profiles.push({ status: 'error', reason: 'auth_wall', profileUrl: url });
+      } else {
+        console.log(`   ✅ ${data.name || 'Unknown'} | ${data.currentCompany || '—'} | ${data.location || '—'}`);
+        profiles.push({ status: 'success', ...data });
+      }
 
     } catch (err) {
       console.log(`   ❌ Failed: ${err.message}`);
