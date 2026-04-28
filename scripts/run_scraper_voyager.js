@@ -263,8 +263,43 @@ async function collectProfileUrls(page, options) {
   return profileUrls;
 }
 
+// ── CLI args ─────────────────────────────────────────────────────────────────
+// Usage:
+//   node run_scraper_voyager.js --keywords "UI UX designer" --country Japan --max 10
+//   node run_scraper_voyager.js --keywords "software engineer" --country "United States" --max 20
+function parseArgs() {
+  const args = process.argv.slice(2);
+  const result = { keywords: '', country: '', industry: '', maxProfiles: 10 };
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--keywords' || args[i] === '-k') result.keywords = args[++i] || '';
+    else if (args[i] === '--country'  || args[i] === '-c') result.country  = args[++i] || '';
+    else if (args[i] === '--industry' || args[i] === '-i') result.industry = args[++i] || '';
+    else if (args[i] === '--max'      || args[i] === '-n') result.maxProfiles = parseInt(args[++i], 10) || 10;
+  }
+  return result;
+}
+
+// ── Output path ───────────────────────────────────────────────────────────────
+function buildOutputPath(keywords, country) {
+  const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-'); // 2026-04-28-14-30-00
+  const slug = (s) => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+  const parts = [slug(keywords), slug(country), ts].filter(Boolean);
+  const filename = parts.join('_') + '.json';
+  const outDir = path.join(__dirname, '..', 'output');
+  if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+  return path.join(outDir, filename);
+}
+
 // ── Main ─────────────────────────────────────────────────────────────────────
 (async () => {
+  const { keywords, country, industry, maxProfiles } = parseArgs();
+
+  if (!keywords && !country && !industry) {
+    console.log('Usage: node run_scraper_voyager.js --keywords "UI UX designer" --country Japan [--max 10]');
+    console.log('       node run_scraper_voyager.js -k "software engineer" -c "United States" -n 20');
+    process.exit(1);
+  }
+
   const cookiesPath = findCookiesPath();
   const browser = await chromium.launch({ headless: true });
   const ctxOptions = { viewport: { width: 1280, height: 900 } };
@@ -294,14 +329,13 @@ async function collectProfileUrls(page, options) {
 
     console.log('='.repeat(60));
     console.log('🔎 LinkedIn Profile Scraper (Voyager/RSC edition)');
+    console.log(`   keywords: ${keywords || '(none)'}`);
+    console.log(`   country:  ${country  || '(none)'}`);
+    console.log(`   industry: ${industry || '(none)'}`);
+    console.log(`   max:      ${maxProfiles}`);
     console.log('='.repeat(60) + '\n');
 
-    const profileUrls = await collectProfileUrls(page, {
-      keywords: 'SWE',
-      country: 'japan',
-      industry: 'internet',
-      maxProfiles: 5
-    });
+    const profileUrls = await collectProfileUrls(page, { keywords, country, industry, maxProfiles });
 
     console.log(`\n✅ Collected ${profileUrls.size} profiles to scrape\n`);
 
@@ -322,14 +356,14 @@ async function collectProfileUrls(page, options) {
       if (idx < profileUrls.size) await jitter(2000, 4000);
     }
 
-    const outPath = path.join(__dirname, '..', 'scrape_results_voyager.json');
+    const outPath = buildOutputPath(keywords || industry, country);
     fs.writeFileSync(outPath, JSON.stringify(profiles, null, 2));
 
     const ok = profiles.filter(p => p.status === 'success').length;
     const withJobs = profiles.filter(p => p.workHistory?.length > 0).length;
     console.log('\n' + '='.repeat(60));
     console.log(`📊 Done  ✅ ${ok} success  💼 ${withJobs} with workHistory`);
-    console.log(`💾 Saved → scrape_results_voyager.json`);
+    console.log(`💾 Saved → ${path.relative(process.cwd(), outPath)}`);
     console.log('='.repeat(60));
 
     console.log('\nSCRAPE_RESULTS_START');

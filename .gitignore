@@ -59,6 +59,7 @@ scripts/config.json
 scrape_results*.json
 results/
 logs/
+output/
 
 # Temporary files
 tmp/
