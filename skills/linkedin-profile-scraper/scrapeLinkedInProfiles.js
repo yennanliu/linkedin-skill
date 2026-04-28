@@ -132,46 +132,51 @@ async function scrapeLinkedInProfiles(page, options = {}) {
           return { _authWall: true, profileUrl: currentUrl };
         }
 
-        // Basic info
-        const name = first('h1.text-heading-xlarge') || first('h1') || first('.pv-top-card-section__name');
-        const headline = first('.text-body-medium.break-words') || first('.pv-top-card-section__headline');
+        // Basic info - Headline is typically the next significant block after the name
+        let headline = null;
+        if (nameEl) {
+            // Traverse up to a common parent and look for the next p or div
+            const headerArea = nameEl.closest('div');
+            if (headerArea) {
+                const nextP = headerArea.parentElement.querySelector('.text-body-medium');
+                headline = nextP ? nextP.textContent.trim() : null;
+            }
+        }
+        
+        if (!headline || headline.startsWith('·')) {
+            headline = first('.text-body-medium') || first('[data-field="headline"]');
+        }
+
         const location =
-          first('.text-body-small.inline.t-black--light.break-words') ||
-          first('.pv-top-card-section__location') ||
-          first('.profile-topcard-person-entity__location');
+          first('.text-body-small.inline') ||
+          text(document.querySelector('[data-field="location"]'));
 
-        // Work history from experience section
+        // Work history - More robust experience discovery
         const workHistory = [];
-        const expSection = document.querySelector('#experience');
+        let expContainer = null;
+        
+        // Search all sections for one containing "Experience" heading
+        const sections = Array.from(document.querySelectorAll('section'));
+        expContainer = sections.find(s => {
+            const h = s.querySelector('h2, h3, span');
+            return h && h.textContent.trim().includes('Experience');
+        });
 
-        if (expSection) {
-          // Try new pvs-list structure first (2024-2025), fall back to artdeco
-          const container =
-            expSection.closest('section') ||
-            expSection.parentElement;
-
-          const items = container
-            ? (container.querySelectorAll('li.pvs-list__paged-list-item').length > 0
-                ? container.querySelectorAll('li.pvs-list__paged-list-item')
-                : container.querySelectorAll('li.artdeco-list__item'))
-            : [];
-
+        if (expContainer) {
+          const items = expContainer.querySelectorAll('li');
           items.forEach((item) => {
-            const boldEl = item.querySelector(
-              '.t-bold span[aria-hidden="true"], ' +
-              '.mr1.t-bold span[aria-hidden="true"], ' +
-              '.pvs-entity__path-node span[aria-hidden="true"]'
-            );
-            const normalEls = item.querySelectorAll('.t-14.t-normal span[aria-hidden="true"]');
-            const lightEls = item.querySelectorAll('.t-14.t-normal.t-black--light span[aria-hidden="true"]');
-
-            const title = boldEl ? boldEl.textContent.trim() : null;
-            const company = normalEls.length > 0 ? normalEls[0].textContent.trim() : null;
-            const dateRange = lightEls.length > 0 ? lightEls[0].textContent.trim() : null;
-            const workLocation = lightEls.length > 1 ? lightEls[1].textContent.trim() : null;
-
-            if (title || company) {
-              workHistory.push({ title, company, dateRange, location: workLocation });
+            const spans = Array.from(item.querySelectorAll('span[aria-hidden="true"]'));
+            // Filter out short spans (like connection degree) and pick the first two long ones
+            const contentSpans = spans.filter(s => s.textContent.trim().length > 3);
+            
+            if (contentSpans.length >= 2) {
+              const title = contentSpans[0].textContent.trim();
+              const company = contentSpans[1].textContent.trim();
+              const dateRange = spans.find(s => s.textContent.match(/\d{4}/))?.textContent.trim() || null;
+              
+              if (title && !['Experience', 'Education', 'Skills'].includes(title)) {
+                workHistory.push({ title, company, dateRange });
+              }
             }
           });
         }
