@@ -55,6 +55,8 @@ scripts/config.json
 
 # Results and logs from automation runs
 *_result.txt
+*_results.json
+scrape_results*.json
 results/
 logs/
 
@@ -63,6 +65,12 @@ tmp/
 temp/
 *.tmp
 *.bak
+scripts/tmp_*.html
+scripts/voyager_*.json
+scripts/gql_*.json
+scripts/sdui_*.txt
+scripts/exp_*.json
+scripts/exp_page.html
 
 # Package manager
 package-lock.json
