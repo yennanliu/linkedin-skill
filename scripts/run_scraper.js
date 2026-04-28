@@ -113,68 +113,146 @@ async function scrapeLinkedInProfiles(page, options = {}) {
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
       await page.waitForTimeout(3000);
 
-      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 3));
-      await page.waitForTimeout(1000);
+      // Scroll gradually to trigger intersection-observer lazy loads
+      // Use larger steps with longer pauses between each
+      for (let i = 0; i < 25; i++) {
+        await page.mouse.wheel(0, 500);
+        await page.waitForTimeout(500);
+      }
+      await page.waitForTimeout(2000);
+
+      // Click "Show all X experiences" if present
       await page.evaluate(() => {
-        const el = document.querySelector('#experience');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const buttons = Array.from(document.querySelectorAll('a, button'));
+        const showAll = buttons.find(b => /show all.*experience/i.test(b.textContent));
+        if (showAll) showAll.click();
       });
       await page.waitForTimeout(1500);
-      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-      await page.waitForTimeout(1000);
 
       const data = await page.evaluate(() => {
-        const text = (el) => (el ? el.textContent.trim() : null);
-        const first = (sel) => text(document.querySelector(sel));
+        const t = (el) => (el ? el.textContent.trim() : null);
 
-        const name = first('h1');
-        const headline = first('.text-body-medium.break-words');
-        const location = first('.text-body-small.inline.t-black--light.break-words');
+        // ── Name ────────────────────────────────────────────────────────────
+        // Aero (2024+): name is in h2, not h1. Skip "0 notifications" noise.
+        const nameEl = Array.from(document.querySelectorAll('h1, h2')).find(el => {
+          const txt = el.textContent.trim();
+          return txt.length > 1 && txt.length < 80 && !txt.match(/^\d/) && !txt.toLowerCase().includes('notification');
+        });
+        const name = nameEl ? nameEl.textContent.trim() : null;
 
+        // ── Headline + Location ─────────────────────────────────────────────
+        // In LinkedIn aero, headline and location are <p> tags in the DOM immediately
+        // after the name h2. Collect all p text in document order, find position of
+        // name, then take the next few paragraphs.
+        let headline = null;
+        let location = null;
+        let _companyLine = null;
+        if (nameEl) {
+          // Collect all visible p text in document order, tagged with position
+          const allPs = Array.from(document.querySelectorAll('p'))
+            .map(p => ({ el: p, txt: p.textContent.trim() }))
+            .filter(({ txt }) => txt.length > 2);
+
+          // Find index of first p that comes after nameEl in DOM order
+          const afterName = [];
+          let pastName = false;
+          for (const { el, txt } of allPs) {
+            if (!pastName) {
+              // Check if this p follows the nameEl in DOM order
+              const pos = nameEl.compareDocumentPosition(el);
+              if (pos & Node.DOCUMENT_POSITION_FOLLOWING) pastName = true;
+            }
+            if (pastName) afterName.push(txt);
+            if (afterName.length >= 10) break;
+          }
+
+          // Filter noise: skip connection degree markers (·), short tokens, the name itself
+          const filtered = afterName.filter(t =>
+            t !== name &&
+            !t.startsWith('\u00b7') &&  // middle dot ·
+            !t.match(/^\d+(st|nd|rd|th)$/) &&
+            t.length > 4
+          );
+
+          headline = filtered[0] || null;
+          // Location comes after the headline — skip filtered[0] and look for short city/country string
+          location = filtered.slice(1).find(t => /,/.test(t) && t.length < 60) || null;
+          // Company line: "CompanyName · Education" — appears right after headline
+          _companyLine = filtered[1] || null;
+        }
+
+        // ── Experience ───────────────────────────────────────────────────────
+        // Find experience section by heading text (works for both old and new architecture)
         const workHistory = [];
-        const expSection = document.querySelector('#experience');
+        const allSections = Array.from(document.querySelectorAll('section, div[data-view-name]'));
+        const expSection = allSections.find(sec => {
+          const heading = sec.querySelector('h2, h3, span');
+          return heading && /^Experience$/i.test(heading.textContent.trim());
+        });
 
         if (expSection) {
-          const parentSection = expSection.closest('section') || expSection.parentElement;
-          const items = parentSection
-            ? parentSection.querySelectorAll('li.artdeco-list__item')
-            : [];
+          const listItems = expSection.querySelectorAll('li');
+          listItems.forEach((item) => {
+            // Collect all visible non-empty text nodes (aria-hidden="true" are the displayed ones)
+            const spans = Array.from(item.querySelectorAll('span[aria-hidden="true"]'))
+              .map(s => s.textContent.trim())
+              .filter(s => s.length > 1 && !s.match(/^·$/));
 
-          items.forEach((item) => {
-            const boldEl = item.querySelector('.t-bold span[aria-hidden="true"], .mr1.t-bold span[aria-hidden="true"]');
-            const normalEls = item.querySelectorAll('.t-14.t-normal span[aria-hidden="true"]');
-            const lightEls = item.querySelectorAll('.t-14.t-normal.t-black--light span[aria-hidden="true"]');
+            if (spans.length < 2) return;
 
-            const title = boldEl ? boldEl.textContent.trim() : null;
-            const company = normalEls.length > 0 ? normalEls[0].textContent.trim() : null;
-            const dateRange = lightEls.length > 0 ? lightEls[0].textContent.trim() : null;
-            const workLocation = lightEls.length > 1 ? lightEls[1].textContent.trim() : null;
+            const title = spans[0];
+            const company = spans[1];
+            // Date range: span matching year pattern
+            const dateRange = spans.find(s => /\d{4}/.test(s) || /present/i.test(s)) || null;
 
-            if (title || company) {
-              workHistory.push({ title, company, dateRange, location: workLocation });
+            if (title && !['Experience', 'Education', 'Skills', 'Interests'].includes(title)) {
+              workHistory.push({ title, company, dateRange });
             }
           });
         }
 
         const currentJob = workHistory[0] || null;
 
-        const industryEl = document.querySelector(
-          '.pv-text-details__right-panel .t-14, ' +
-          '.pv-top-card--list li:last-child'
-        );
-        const industry = industryEl ? industryEl.textContent.trim() : null;
+        // Fallback: parse currentTitle/currentCompany from top-card data when
+        // the full experience section didn't load (LinkedIn aero lazy-loads it)
+        let currentTitle = currentJob ? currentJob.title : null;
+        let currentCompany = currentJob ? currentJob.company : null;
+        if (!currentCompany && _companyLine) {
+          // "Mercari, Inc. · ABV-Indian Institute..." → take first segment before ·
+          currentCompany = _companyLine.split('·')[0].trim() || null;
+        }
+        if (!currentTitle && headline) {
+          // "Senior Software Engineer @ Mercari, Japan" → "Senior Software Engineer"
+          // "Job Consultant at IZANAU | ..." → "Job Consultant"
+          const m = headline.match(/^(.+?)(?:\s+[@|]|\s+at\s)/i);
+          currentTitle = m ? m[1].trim() : null;
+        }
+        // Seed workHistory with top-card entry if experience section not loaded
+        if (workHistory.length === 0 && (currentTitle || currentCompany)) {
+          workHistory.push({ title: currentTitle, company: currentCompany, dateRange: null, source: 'top-card' });
+        }
 
         return {
           name,
           headline,
           location,
-          currentCompany: currentJob ? currentJob.company : null,
-          currentTitle: currentJob ? currentJob.title : null,
-          industry,
+          currentCompany,
+          currentTitle,
+          industry: null,
           workHistory,
-          profileUrl: window.location.href
+          profileUrl: window.location.href,
+          _expFound: !!expSection
         };
       });
+
+      // Debug: if workHistory still empty, save page HTML for inspection
+      if (data.workHistory.length === 0) {
+        const html = await page.content();
+        const tmpPath = path.join(__dirname, `tmp_profile_${idx}.html`);
+        fs.writeFileSync(tmpPath, html);
+        console.log(`   ⚠️  workHistory empty (expFound=${data._expFound}). HTML saved → ${tmpPath}`);
+      }
+      delete data._expFound;
 
       console.log(`   ✅ ${data.name || 'Unknown'} | ${data.currentCompany || '—'} | ${data.location || '—'}`);
       profiles.push({ status: 'success', ...data });
@@ -191,47 +269,63 @@ async function scrapeLinkedInProfiles(page, options = {}) {
 }
 
 (async () => {
+  const cookiesPath = fs.existsSync(path.join(__dirname, 'cookies.json'))
+    ? path.join(__dirname, 'cookies.json')
+    : path.join(__dirname, '..', 'cookies.json');
+  const hasCookies = fs.existsSync(cookiesPath);
+
   const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext();
+  const ctxOptions = { viewport: { width: 1280, height: 900 } };
+  if (hasCookies) ctxOptions.storageState = cookiesPath;
+  const context = await browser.newContext(ctxOptions);
   const page = await context.newPage();
 
   try {
-    console.log('🚀 Navigating to LinkedIn login page...');
-    await page.goto('https://www.linkedin.com/login', { waitUntil: 'networkidle' });
-
-    console.log('👤 Entering credentials...');
-    await page.fill('#username', config.linkedin.email);
-    await page.fill('#password', config.linkedin.password);
-    await page.click('button[type="submit"]');
-
-    console.log('⏳ Waiting for login to complete...');
-    // Wait for the feed page or a verification check
-    await page.waitForTimeout(5000);
-
-    if (page.url().includes('checkpoint')) {
-      console.log('🛑 SECURITY CHECK DETECTED! Current URL:', page.url());
-      try {
-        const pinInput = await page.$('input#input__email_verification_pin, input[name="pin"]');
-        if (pinInput) {
-          await pinInput.fill('328918');
-          await page.click('#email-pin-submit-button, button[type="submit"]');
-          console.log('✅ Code submitted. Waiting for redirection...');
-          await page.waitForTimeout(10000);
-        } else {
-          console.log('❌ Could not find PIN input field.');
-          const html = await page.content();
-          console.log('Page HTML snippet:', html.substring(0, 1000));
-        }
-      } catch (e) {
-        console.log('❌ Failed to handle security code:', e.message);
+    if (hasCookies) {
+      console.log('🍪 Using saved session from cookies.json');
+      await page.goto('https://www.linkedin.com/feed', { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await page.waitForTimeout(2000);
+      if (!page.url().includes('linkedin.com/feed')) {
+        throw new Error('Saved session expired — delete cookies.json and re-run to login fresh');
       }
+      console.log('✅ Session valid.');
+    } else {
+      console.log('🚀 Navigating to LinkedIn login page...');
+      await page.goto('https://www.linkedin.com/login', { waitUntil: 'domcontentloaded', timeout: 60000 });
+
+      console.log('👤 Entering credentials...');
+      await page.fill('#username', config.linkedin.email);
+      await page.fill('#password', config.linkedin.password);
+      await page.click('button[type="submit"]');
+
+      console.log('⏳ Waiting for login to complete...');
+      await page.waitForTimeout(5000);
+
+      if (page.url().includes('checkpoint')) {
+        console.log('🛑 SECURITY CHECK DETECTED! Current URL:', page.url());
+        try {
+          const pinInput = await page.$('input#input__email_verification_pin, input[name="pin"]');
+          if (pinInput) {
+            await pinInput.fill('328918');
+            await page.click('#email-pin-submit-button, button[type="submit"]');
+            console.log('✅ Code submitted. Waiting for redirection...');
+            await page.waitForTimeout(10000);
+          } else {
+            console.log('❌ Could not find PIN input field.');
+            const html = await page.content();
+            console.log('Page HTML snippet:', html.substring(0, 1000));
+          }
+        } catch (e) {
+          console.log('❌ Failed to handle security code:', e.message);
+        }
+      }
+
+      await page.waitForURL(/linkedin\.com\/feed/, { timeout: 60000 }).catch(() => {
+        console.log('⚠️ Did not reach feed page. Current URL:', page.url());
+      });
+
+      console.log('✅ Logged in successfully.');
     }
-
-    await page.waitForURL(/linkedin\.com\/feed/, { timeout: 60000 }).catch(() => {
-      console.log('⚠️ Did not reach feed page. Current URL:', page.url());
-    });
-
-    console.log('✅ Logged in successfully.');
 
     const results = await scrapeLinkedInProfiles(page, {
       keywords: 'SWE',
