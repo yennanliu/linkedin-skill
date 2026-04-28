@@ -1,0 +1,291 @@
+[
+  {
+    "status": "success",
+    "name": "Yuki I.",
+    "headline": "Research Engineer @Sakana AI",
+    "location": "Tokyo, Japan",
+    "currentCompany": "MC Digital｜エムシーデジタル",
+    "currentTitle": "Software Engineer",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "Software Engineer",
+        "company": "MC Digital｜エムシーデジタル",
+        "dateRange": "Jan 2024 - Feb 2024 · 2 mos"
+      },
+      {
+        "title": "System Engineer",
+        "company": "NTT DATA",
+        "dateRange": "Oct 2023 · 1 mo"
+      },
+      {
+        "title": "Data Scientist",
+        "company": "NRIデジタル株式会社",
+        "dateRange": "Sep 2023 · 1 mo"
+      },
+      {
+        "title": "IPA: Information-technology Promotion Agency, Japan",
+        "company": "FY2022 MITOU Program",
+        "dateRange": "Jun 2022 - Mar 2023 · 10 mos"
+      },
+      {
+        "title": "Data Scientist",
+        "company": "株式会社ナガセ",
+        "dateRange": "Dec 2020 - Mar 2022 · 1 yr 4 mos"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/yuki-imajuku/"
+  },
+  {
+    "status": "success",
+    "name": "Yu-Wen Kuo",
+    "headline": "Member of Technical Staff at Microsoft AI",
+    "location": "Redmond, Washington, United States",
+    "currentCompany": "Member of Technical Staff",
+    "currentTitle": "Microsoft AI",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "Microsoft AI",
+        "company": "Member of Technical Staff",
+        "dateRange": "Mar 2025 - Present · 1 yr 2 mos"
+      },
+      {
+        "title": "微軟公司",
+        "company": "Apache Kafka, Kubernetes and +6 skills",
+        "dateRange": "Full-time · 4 yrs 8 mos"
+      },
+      {
+        "title": "Software Engineer Tech Lead",
+        "company": "微軟公司",
+        "dateRange": "May 2022 - Mar 2025 · 2 yrs 11 mos"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/tobbykuo/"
+  },
+  {
+    "status": "success",
+    "name": "Wakako Shigeizumi",
+    "headline": "Sakana AI ex-AWS, Amazon TA",
+    "location": "Minh-Tu, Siddharth and 5 other mutual connections",
+    "currentCompany": "Recruiter",
+    "currentTitle": "Sakana AI",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "Sakana AI",
+        "company": "Recruiter",
+        "dateRange": "Feb 2026 - Present · 3 mos"
+      },
+      {
+        "title": "Amazon Web Services (AWS)",
+        "company": "Sakana AI",
+        "dateRange": "Permanent · 6 yrs 6 mos"
+      },
+      {
+        "title": "Recruiter",
+        "company": "Amazon Web Services (AWS)",
+        "dateRange": "Oct 2021 - Feb 2026 · 4 yrs 5 mos"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/wakako-shigeizumi-23ba65205/"
+  },
+  {
+    "status": "success",
+    "name": "Xuehao YANG",
+    "headline": "AI Engineer at Shanda AI Research Tokyo",
+    "location": "Tokyo, Japan",
+    "currentCompany": "Shanda AI Research Tokyo",
+    "currentTitle": "AI Engineer",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "AI Engineer",
+        "company": "Shanda AI Research Tokyo",
+        "dateRange": "Apr 2026 - Present · 1 mo"
+      },
+      {
+        "title": "Full Stack Engineer",
+        "company": "Mujin",
+        "dateRange": "May 2025 - Mar 2026 · 11 mos"
+      },
+      {
+        "title": "Polyphony Digital",
+        "company": "Graphics Programmer",
+        "dateRange": "Sep 2024 - Oct 2024 · 2 mos"
+      },
+      {
+        "title": "即刻App",
+        "company": "C++, Computer Graphics and +1 skill",
+        "dateRange": "Permanent · 5 yrs 2 mos"
+      },
+      {
+        "title": "Senior Software Engineer",
+        "company": "即刻App",
+        "dateRange": "Apr 2021 - Mar 2023 · 2 yrs"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/xuehaoyang/"
+  },
+  {
+    "status": "success",
+    "name": "Hayato Watahiki",
+    "headline": "PhD Student in AI/ML at The University of Tokyo",
+    "location": "Tokyo, Japan",
+    "currentCompany": "Integral AI",
+    "currentTitle": "Machine Learning Engineer",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "Machine Learning Engineer",
+        "company": "Integral AI",
+        "dateRange": "Jul 2021 - Present · 4 yrs 10 mos"
+      },
+      {
+        "title": "Robotics AI Engineer",
+        "company": "Integral AI",
+        "dateRange": "Feb 2021 - Mar 2021 · 2 mos"
+      },
+      {
+        "title": "Machine Learning Engineer",
+        "company": "Recruit Co.,Ltd.",
+        "dateRange": "Mar 2020 · 1 mo"
+      },
+      {
+        "title": "Research Engineer",
+        "company": "Preferred Networks, Inc.",
+        "dateRange": "Aug 2018 - Mar 2019 · 8 mos"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/hayato-watahiki-4410891b8/"
+  },
+  {
+    "status": "success",
+    "name": "Satyam Tiwari",
+    "headline": "AI Engineer | Building LLM & Speech AI Systems | RAG, Embeddings, NLP | Python | Tokyo",
+    "location": "Shinjuku-ku, Tokyo, Japan",
+    "currentCompany": "NEC Corporation",
+    "currentTitle": "Artificial Intelligence Engineer",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "Artificial Intelligence Engineer",
+        "company": "NEC Corporation",
+        "dateRange": "Mar 2026 - Present · 2 mos"
+      },
+      {
+        "title": "Human Resocia/Global IT Talent",
+        "company": "Working on Image Recognition and RAG development",
+        "dateRange": "Full-time · 3 yrs 4 mos"
+      },
+      {
+        "title": "Data Scientist",
+        "company": "Human Resocia/Global IT Talent",
+        "dateRange": "Mar 2024 - Present · 2 yrs 2 mos"
+      },
+      {
+        "title": "Data Scientist",
+        "company": "Business Japanese Training",
+        "dateRange": "Jan 2023 - Feb 2024 · 1 yr 2 mos"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/satyam-tiwari-70210a22b/"
+  },
+  {
+    "status": "success",
+    "name": "Gowtham SB",
+    "headline": "Sr Data Engineer | PayPal | YouTuber",
+    "location": "Chennai, Tamil Nadu, India",
+    "currentCompany": "PayPal",
+    "currentTitle": "Senior Data Engineer",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "Senior Data Engineer",
+        "company": "PayPal",
+        "dateRange": "Jan 2024 - Present · 2 yrs 4 mos"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/sbgowtham/"
+  },
+  {
+    "status": "success",
+    "name": "Khuzan Cama",
+    "headline": "Team Lead at Fidel Consulting KK",
+    "location": "Tokyo, Tokyo, Japan",
+    "currentCompany": "Fidel Consulting KK",
+    "currentTitle": "Team Lead",
+    "industry": null,
+    "workHistory": [],
+    "profileUrl": "https://www.linkedin.com/in/khuzan-cama-4b6b42206/"
+  },
+  {
+    "status": "success",
+    "name": "Fabio Tanaka",
+    "headline": "Software Engineer based in Tokyo, Japan.Researcher in AI, specifically, evolutionary computation.",
+    "location": "Tokyo, Tokyo, Japan",
+    "currentCompany": "Rakuten",
+    "currentTitle": "Machine Learning Engineer",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "Machine Learning Engineer",
+        "company": "Rakuten",
+        "dateRange": "Dec 2024 - Present · 1 yr 5 mos"
+      },
+      {
+        "title": "Software Engineer",
+        "company": "株式会社サステナ",
+        "dateRange": "Apr 2023 - Dec 2024 · 1 yr 9 mos"
+      },
+      {
+        "title": "Software Engineer",
+        "company": "RockSpoon Inc",
+        "dateRange": "Oct 2019 - Nov 2020 · 1 yr 2 mos"
+      },
+      {
+        "title": "Full Stack Developer Interniship",
+        "company": "Universidade de São Paulo",
+        "dateRange": "Jun 2017 - Jul 2018 · 1 yr 2 mos"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/fabio-tanaka-930496182/"
+  },
+  {
+    "status": "success",
+    "name": "Kim Nguyen",
+    "headline": "Tech Consultant | Software Engineer at Build+ | Connecting Talent with Opportunity",
+    "location": "Tokyo, Japan",
+    "currentCompany": "Build+ (formerly Wahl+Case)",
+    "currentTitle": "Recruitment Consultant",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "Recruitment Consultant",
+        "company": "Build+ (formerly Wahl+Case)",
+        "dateRange": "Sep 2024 - Present · 1 yr 8 mos"
+      },
+      {
+        "title": "Recruitment Consultant",
+        "company": "Huxley",
+        "dateRange": "May 2023 - Aug 2024 · 1 yr 4 mos"
+      },
+      {
+        "title": "Coordinator",
+        "company": "WISDOM ACADEMY Inc.",
+        "dateRange": "Jan 2022 - Apr 2023 · 1 yr 4 mos"
+      },
+      {
+        "title": "Alo Groups Co.",
+        "company": "Real Estate Agent/ Digital Marketer",
+        "dateRange": "Jan 2021 - Apr 2023 · 2 yrs 4 mos"
+      },
+      {
+        "title": "English Teaching Assistant",
+        "company": "NOVA HOLDINGS CO.,LTD.",
+        "dateRange": "Oct 2021 · 1 mo"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/kim-nguyen-74787a198/"
+  }
+]

@@ -1,0 +1,442 @@
+[
+  {
+    "status": "success",
+    "name": "Shota Nakano",
+    "headline": "Software Engineer",
+    "location": "Saitama, Japan",
+    "currentCompany": "Sansan株式会社",
+    "currentTitle": "Software Engineer",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "Software Engineer",
+        "company": "Sansan株式会社",
+        "dateRange": "Oct 2024 - Present · 1 yr 7 mos"
+      },
+      {
+        "title": "Software Engineer",
+        "company": "Avanade",
+        "dateRange": "Apr 2024 - Jul 2024 · 4 mos"
+      },
+      {
+        "title": "株式会社コドモン",
+        "company": "Avanade",
+        "dateRange": "Permanent · 4 yrs 8 mos"
+      },
+      {
+        "title": "Engineering Manager",
+        "company": "株式会社コドモン",
+        "dateRange": "Oct 2020 - Mar 2024 · 3 yrs 6 mos"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/shota0612/"
+  },
+  {
+    "status": "success",
+    "name": "Eric Turner",
+    "headline": "Founder @ Japan Dev ⛩️ Find a tech job in Japan #つながり申請歓迎",
+    "location": "Tokyo, Japan",
+    "currentCompany": "Founder & CEO",
+    "currentTitle": "Japan Dev",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "Japan Dev",
+        "company": "Founder & CEO",
+        "dateRange": "2018 - Present · 8 yrs 4 mos"
+      },
+      {
+        "title": "Engineering Management",
+        "company": "Mercari, Inc.",
+        "dateRange": "3 yrs"
+      },
+      {
+        "title": "Engineering Manager",
+        "company": "Mercari, Inc.",
+        "dateRange": "May 2019 - May 2021 · 2 yrs 1 mo"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/etdev/"
+  },
+  {
+    "status": "success",
+    "name": "Rosh Luke",
+    "headline": "Senior Technical Recruiter - Japan & USA.  Account Management, Business development, Customer management",
+    "location": "Kun Yu, Akihisa and 15 other mutual connections",
+    "currentCompany": "Senior Technical Recruiter",
+    "currentTitle": "Signate Career Consultants",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "Signate Career Consultants",
+        "company": "Senior Technical Recruiter",
+        "dateRange": "Oct 2017 - Present · 8 yrs 7 mos"
+      },
+      {
+        "title": "Arrow Electronics",
+        "company": "Technical Recruiter",
+        "dateRange": "Jul 2015 - Sep 2017 · 2 yrs 3 mos"
+      },
+      {
+        "title": "Venus Resource",
+        "company": "Senior Executive Human Resources",
+        "dateRange": "Mar 2014 - Apr 2015 · 1 yr 2 mos"
+      },
+      {
+        "title": "Trump Trainers & Consultants Pvt.Ltd",
+        "company": "IT Recruiter",
+        "dateRange": "Jul 2010 - Mar 2014 · 3 yrs 9 mos"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/rosh-luke-81235896/"
+  },
+  {
+    "status": "success",
+    "name": "Arul J",
+    "headline": "CISSP, GenAI Leader Google Certified ,4x AWS,4x GCP,2x OCI . IT Specialist at United States Department of Defense.",
+    "location": "San Jose, California, United States",
+    "currentCompany": "DMDC",
+    "currentTitle": "Information Technology Specialist at United States Department of Defense",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "Information Technology Specialist at United States Department of Defense",
+        "company": "DMDC",
+        "dateRange": "Jan 2009 - Present · 17 yrs 4 mos"
+      },
+      {
+        "title": "Senior Software Engineer",
+        "company": "Northrop Grumman",
+        "dateRange": "Jun 2007 - 2009 · 1 yr 8 mos"
+      },
+      {
+        "title": "Software engineer",
+        "company": "Adobe",
+        "dateRange": "2005 - 2007 · 2 yrs"
+      },
+      {
+        "title": "Software Engineer",
+        "company": "IBM",
+        "dateRange": "2004 - 2005 · 1 yr"
+      },
+      {
+        "title": "Software engineer",
+        "company": "verisign",
+        "dateRange": "2001 - 2003 · 2 yrs"
+      },
+      {
+        "title": "Software engineer",
+        "company": "cisco",
+        "dateRange": "2000 - 2001 · 1 yr"
+      },
+      {
+        "title": "AT&T labs",
+        "company": "Member Technical staff",
+        "dateRange": "Jan 1998 - Dec 2000 · 3 yrs"
+      },
+      {
+        "title": "Engineer",
+        "company": "SCL",
+        "dateRange": "1992 - 1997 · 5 yrs"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/arul-j-4468861/"
+  },
+  {
+    "status": "success",
+    "name": "Benjamin Rogojan",
+    "headline": "Fractional Head of Data | Tool-Agnostic. Outcome-Obsessed",
+    "location": "186,208 followers",
+    "currentCompany": "Seattle Data Guy",
+    "currentTitle": "Owner and Data Consultant",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "Owner and Data Consultant",
+        "company": "Seattle Data Guy",
+        "dateRange": "Jan 2017 - Present · 9 yrs 4 mos"
+      },
+      {
+        "title": "Estuary",
+        "company": "Strategic Advisor",
+        "dateRange": "Jul 2023 - Present · 2 yrs 10 mos"
+      },
+      {
+        "title": "Roe AI",
+        "company": "Advisor",
+        "dateRange": "Sep 2024 - Present · 1 yr 8 mos"
+      },
+      {
+        "title": "Mage",
+        "company": "Advisor",
+        "dateRange": "Mar 2023 - Present · 3 yrs 2 mos"
+      },
+      {
+        "title": "Data Engineer",
+        "company": "Facebook",
+        "dateRange": "Nov 2018 - Dec 2021 · 3 yrs 2 mos"
+      },
+      {
+        "title": "Data Science And Data Engineering Consultant",
+        "company": "Acheron Analytics",
+        "dateRange": "Nov 2016 - May 2021 · 4 yrs 7 mos"
+      },
+      {
+        "title": "Data Engineer",
+        "company": "Healthentic",
+        "dateRange": "Oct 2016 - Oct 2018 · 2 yrs 1 mo"
+      },
+      {
+        "title": "Business Intelligence Developer",
+        "company": "Providence Health & Services",
+        "dateRange": "Jul 2015 - Oct 2016 · 1 yr 4 mos"
+      },
+      {
+        "title": "University of Washington",
+        "company": "MIS Analysis Grader",
+        "dateRange": "Jan 2016 - Mar 2016 · 3 mos"
+      },
+      {
+        "title": "Coding With Kids",
+        "company": "Center Manger/Lead Instructor",
+        "dateRange": "Aug 2014 - Aug 2015 · 1 yr 1 mo"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/benjaminrogojan/"
+  },
+  {
+    "status": "success",
+    "name": "Srinidhi Sridharan",
+    "headline": "Distributed Data Systems @Autodesk |  Ex-Salesforce  | Big Data | ML",
+    "location": "Coquitlam, British Columbia, Canada",
+    "currentCompany": "Permanent Full-time",
+    "currentTitle": "Data Engineering Lead - Generative AI",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "Data Engineering Lead - Generative AI",
+        "company": "Permanent Full-time",
+        "dateRange": "Sep 2023 - Present · 2 yrs 8 mos"
+      },
+      {
+        "title": "Data Engineer",
+        "company": "Building production-scale multimodal ML infrastructure that powers Autodesk's foundation models. I architect and optimize distributed data pipelines processing millions of 3D CAD geometries, enabling research teams to train models at scale.",
+        "dateRange": "Sep 2022 - Sep 2023 · 1 yr 1 mo"
+      },
+      {
+        "title": "Software Engineer - Data Intelligence Platform",
+        "company": "Salesforce",
+        "dateRange": "Jan 2022 - Jun 2022 · 6 mos"
+      },
+      {
+        "title": "Independent consultant - Senior Data Engineer",
+        "company": "Data Dynamics",
+        "dateRange": "Jul 2019 - Jan 2022 · 2 yrs 7 mos"
+      },
+      {
+        "title": "Data Engineer - Center of Excellence",
+        "company": "Kaar Technologies",
+        "dateRange": "Feb 2017 - Jun 2019 · 2 yrs 5 mos"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/srinidhi-s/"
+  },
+  {
+    "status": "success",
+    "name": "Chandra Bhongir",
+    "headline": "Senior Systems Engineer at United States Space Force",
+    "location": "Northridge, California, United States",
+    "currentCompany": "Senior Systems Engineer",
+    "currentTitle": "United States Space Force",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "United States Space Force",
+        "company": "Senior Systems Engineer",
+        "dateRange": "May 2018 - Present · 8 yrs"
+      },
+      {
+        "title": "ITT Exelis",
+        "company": "Member Technical Staff",
+        "dateRange": "Aug 2010 - Oct 2012 · 2 yrs 3 mos"
+      },
+      {
+        "title": "Medtronic",
+        "company": "Principal Software Enginner",
+        "dateRange": "Aug 2009 - Apr 2010 · 9 mos"
+      },
+      {
+        "title": "Northrop Grumman Corporation",
+        "company": "Senior Systems Engineer, SBIRS SEIT",
+        "dateRange": "Sep 2002 - Sep 2008 · 6 yrs 1 mo"
+      },
+      {
+        "title": "Lockheed Martin Corporation - Skunk Works",
+        "company": "Senior Computer Systems Specialist",
+        "dateRange": "1997 - 2000 · 3 yrs"
+      },
+      {
+        "title": "Principal Investigator for IR&D responsible for design and development of common, reusable Modular Avionics Architecture (MAA) framework for use across various tactical fighter aircraft platforms.",
+        "company": "Successfully implemented and demonstrated proof-of-concept, plug-and-play capability of different software and hardware building blocks in support of legacy avionics upgrades. Open, Scalable and COTS based solution. C/C++/Ada running under VxWorks RTOS.",
+        "dateRange": "Presented briefing on Lockheed’s IR&D effort to the modular avionics architecture subcommittee at the Society of Automotive Engineers (SAE), April 1999, Nashville, Tennessee. Member of SAE ASD, AS-5 and AS-2 GOA standards development subcommittees."
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/chandra-bhongir-6a9a403a/"
+  },
+  {
+    "status": "success",
+    "name": "Nikhil Nilakantan",
+    "headline": "General Manager, Product & Engineering Exec at Amazon.",
+    "location": "Seattle, Washington, United States",
+    "currentCompany": "Amazon",
+    "currentTitle": "GM, Amazon Advertising",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "GM, Amazon Advertising",
+        "company": "Amazon",
+        "dateRange": "May 2019 - Present · 7 yrs"
+      },
+      {
+        "title": "Global Head of Reading Growth, Amazon Kindle",
+        "company": "I currently lead multiple high growth Amazon Device, Entertainment, and Stores business lines – Fire TV, Prime Video, Alexa, Fire Tablet, IMDb, Audio Ads, and Grocery (in-store and online). Previously led display ad supply & monetization for Amazon.com/Amazon mobile apps, and vertical ad programs for Books Ads, Pharma & Healthcare, Amazon Business and Local Ads. Responsible for all aspects of the business including multi-Billion $ P&L growing at high double-digit CAGR, and demand growth (5x active advertisers in 4 years). Own the vision, product strategy, roadmap, and delivery of all advertising product lines in each area – search advertising, brand shopping, and display advertising across web, mobile, devices, video, audio etc. This includes all advertiser and consumer facing features WW, and all GTM and demand generation activities.",
+        "dateRange": "Oct 2015 - May 2019 · 3 yrs 8 mos"
+      },
+      {
+        "title": "Director of Product Management",
+        "company": "Match.com",
+        "dateRange": "Oct 2013 - Sep 2015 · 2 yrs"
+      },
+      {
+        "title": "Glass (shopglass.com)",
+        "company": "Co-Founder & CEO",
+        "dateRange": "Feb 2012 - Aug 2013 · 1 yr 7 mos"
+      },
+      {
+        "title": "moreTap Inc.",
+        "company": "Glass was an iPhone app that promoted discovery of clothing & accessories across the long tail of fashion stores in the US. At the time, 98% of fashion oriented stores in the US did not publish product inventory information. We built a product discovery layer on top of the social graph that gathered, geo-coded, and categorized product data from >10x more stores than the competition i.e. even across the long tail of ~300K stores with only 1 to 3 locations.",
+        "dateRange": "2 yrs 10 mos"
+      },
+      {
+        "title": "Co-Founder & CEO",
+        "company": "moreTap Inc.",
+        "dateRange": "Aug 2010 - Dec 2011 · 1 yr 5 mos"
+      },
+      {
+        "title": "Co-Founder & CEO",
+        "company": "Founder of moreTap Inc.  moreTap developed and launched a white-label iOS, Android application platform that improved the attendee experience for conferences and live events, while providing better communication and analytics for the organizer.",
+        "dateRange": "Mar 2009 - Aug 2010 · 1 yr 6 mos"
+      },
+      {
+        "title": "Social Span Media LLC",
+        "company": "President & CEO",
+        "dateRange": "Sep 2007 - Jul 2009 · 1 yr 11 mos"
+      },
+      {
+        "title": "Inventive Path LLC",
+        "company": "Owner",
+        "dateRange": "Aug 2007 - Feb 2009 · 1 yr 7 mos"
+      },
+      {
+        "title": "Inventive Path provided specialized consulting services to the technology industry - Software, Internet, Consumer Electronics and Hardware. Focused on Product Innovation, Strategy, Marketing, and Product Management.",
+        "company": "Texas Instruments, Inc.",
+        "dateRange": "5 yrs 10 mos"
+      },
+      {
+        "title": "Product Manager",
+        "company": "Texas Instruments, Inc.",
+        "dateRange": "2005 - Aug 2007 · 2 yrs 8 mos"
+      },
+      {
+        "title": "Sr. Manager, Software Quality",
+        "company": "Founding PM for the TI-Nspire line of graphing calculators that I helped launch globally. Overall responsibility for developing and communicating the vision, strategy, requirements and product roadmaps for desktop and embedded handheld Software applications, systems software, Software Development Kit (SDK) and Content Development Kit (CDK). Explored new methods of delivering digital content over the web to handheld products. Designed and owned Internationalization & Localization strategies for new products targeted at non-US markets. Used various market and customer analysis techniques to gather requirements from customers in the US, Europe, Asia and Australia. Helped isolate new product/market opportunities, defined ROI, value proposition and positioning. Interfaced with product development to ensure delivery of the right product to customers.",
+        "dateRange": "Nov 2001 - Apr 2005 · 3 yrs 6 mos"
+      },
+      {
+        "title": "Software Test Engineer",
+        "company": "Hewlett Packard Co.",
+        "dateRange": "Mar 2001 - Aug 2001 · 6 mos"
+      },
+      {
+        "title": "Center for Software Engineering Research, Florida Institute of Technology",
+        "company": "Research Assistant & Project Lead",
+        "dateRange": "Aug 1998 - Dec 2000 · 2 yrs 5 mos"
+      },
+      {
+        "title": "SDET Intern",
+        "company": "Microsoft",
+        "dateRange": "1999 - 2000 · 1 yr"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/nikhilnilakantan/"
+  },
+  {
+    "status": "success",
+    "name": "Yash Arora",
+    "headline": "Software Development Engineer at Amazon in Washington, United States",
+    "location": "Seattle, Washington, United States",
+    "currentCompany": "Amazon",
+    "currentTitle": "Software Development Engineer 2",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "Software Development Engineer 2",
+        "company": "Amazon",
+        "dateRange": "Oct 2022 - Present · 3 yrs 7 mos"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/yash-arora-7147a370/"
+  },
+  {
+    "status": "success",
+    "name": "Joanne Sun",
+    "headline": "Talent Acquisition Manager at ByteDance/TikTok | ex-Alibaba | ex-Google",
+    "location": "22,322 followers",
+    "currentCompany": "ByteDance",
+    "currentTitle": "Talent Acquisition Manager, Data & AI (APAC)",
+    "industry": null,
+    "workHistory": [
+      {
+        "title": "Talent Acquisition Manager, Data & AI (APAC)",
+        "company": "ByteDance",
+        "dateRange": "Jul 2025 - Present · 10 mos"
+      },
+      {
+        "title": "Talent Acquisition Manager, Data & AI (APAC)",
+        "company": "TikTok",
+        "dateRange": "Jul 2025 - Present · 10 mos"
+      },
+      {
+        "title": "Global Talent Acquisition Manager",
+        "company": "Alibaba Cloud",
+        "dateRange": "Feb 2021 - Jul 2025 · 4 yrs 6 mos"
+      },
+      {
+        "title": "Google",
+        "company": "Cloud Recruiter, JAPAC",
+        "dateRange": "Apr 2019 - Feb 2021 · 1 yr 11 mos"
+      },
+      {
+        "title": "United Microelectronics Corporation (UMC)",
+        "company": "Hiring Cloud professionals/leaderships (GTM positions) in Asia Pacific",
+        "dateRange": "5 yrs"
+      },
+      {
+        "title": "Senior University Recruiter",
+        "company": "United Microelectronics Corporation (UMC)",
+        "dateRange": "May 2014 - Apr 2019 · 5 yrs"
+      },
+      {
+        "title": "Senior Technical Recruiter",
+        "company": "Taiwan",
+        "dateRange": "May 2014 - Apr 2019 · 5 yrs"
+      },
+      {
+        "title": "Human Resources Compensation & Benefits",
+        "company": "Singapore/Taiwan",
+        "dateRange": "Oct 2017 - Mar 2019 · 1 yr 6 mos"
+      }
+    ],
+    "profileUrl": "https://www.linkedin.com/in/joanne-sun-0720/"
+  }
+]
