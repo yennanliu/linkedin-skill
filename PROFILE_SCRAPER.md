@@ -129,11 +129,16 @@ await scrapeLinkedInProfiles(page, {
 
 ## How It Works
 
-1. Builds a LinkedIn People search URL from the provided filters.
-2. Collects profile URLs from the search results page(s).
-3. Visits each profile and scrolls to trigger lazy-loaded sections.
-4. Extracts structured data via `page.evaluate()`.
-5. Returns an array of profile objects.
+LinkedIn's **aero architecture** (2024+) does not render the Experience section in the main profile DOM — it is loaded via React Server Components (RSC) and never lands in the page HTML, even after full scrolling.
+
+The recommended approach (`run_scraper_voyager.js`) uses two page visits per profile:
+
+1. Builds a LinkedIn People search URL from filters and collects profile URLs.
+2. **Main profile page** (`/in/{vanityName}/`) — extracts name, headline, location from the top card via DOM traversal.
+3. **Experience subpage** (`/in/{vanityName}/details/experience/`) — loads the full experience list via LinkedIn's RSC pagination. Parses `document.body.innerText` (no CSS selectors — immune to LinkedIn's hashed class names).
+4. Returns a structured array with complete `workHistory`.
+
+The legacy DOM scraper (`run_scraper_dom.js`) visits only the main profile page and can extract the current job from the top card but cannot retrieve full work history.
 
 ---
 
@@ -198,11 +203,25 @@ await scrapeLinkedInProfiles(page, {
 
 ## Files
 
-| File | Purpose |
-|------|---------|
-| `skills/linkedin-profile-scraper/SKILL.md` | Skill entry point (read by Claude/Gemini) |
-| `skills/linkedin-profile-scraper/scrapeLinkedInProfiles.js` | Batch scraper |
-| `skills/linkedin-profile-scraper/scrapeSingleProfile.js` | Single profile scraper |
+| File | Purpose | workHistory |
+|------|---------|-------------|
+| `scripts/run_scraper_voyager.js` | **Recommended** — visits `/details/experience/` per profile | ✅ Full history |
+| `scripts/run_scraper_dom.js` | Fallback — top-card DOM scraper | ⚠️ Current job only |
+| `scripts/run_scraper.js` | Legacy DOM scraper | ⚠️ Current job only |
+| `scripts/login_cli.js` | Headless login, saves `cookies.json` | — |
+| `skills/linkedin-profile-scraper/SKILL.md` | Skill entry point (MCP browser automation) | — |
+| `skills/linkedin-profile-scraper/scrapeLinkedInProfiles.js` | Batch scraper for MCP usage | ⚠️ Current job only |
+| `skills/linkedin-profile-scraper/scrapeSingleProfile.js` | Single profile for MCP usage | ⚠️ Current job only |
+
+### Quick Start (recommended)
+
+```bash
+# 1. Save a LinkedIn session
+node scripts/login_cli.js
+
+# 2. Run the Voyager scraper
+node scripts/run_scraper_voyager.js
+```
 
 ---
 

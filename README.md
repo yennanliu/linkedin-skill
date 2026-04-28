@@ -111,7 +111,9 @@ target 25 applications, Easy Apply only
 
 ## Skill 2: Profile Scraper
 
-Scrape LinkedIn profiles filtered by company, country, and/or industry.
+Scrape LinkedIn profiles filtered by company, country, and/or industry — including full work history.
+
+> **Architecture note:** LinkedIn's aero architecture (2024+) does not render the Experience section in the main profile DOM. Full `workHistory` requires visiting `/in/{vanityName}/details/experience/` per profile. Use `run_scraper_voyager.js` for complete results.
 
 ### Extracted Fields
 
@@ -123,8 +125,39 @@ Scrape LinkedIn profiles filtered by company, country, and/or industry.
 | `currentCompany` | Most recent employer |
 | `currentTitle` | Current job title |
 | `industry` | Industry label |
-| `workHistory` | Array of `{ title, company, dateRange, location }` |
+| `workHistory` | Array of `{ title, company, dateRange }` — full history |
 | `profileUrl` | LinkedIn profile URL |
+
+### Scripts
+
+| Script | workHistory | Notes |
+|--------|-------------|-------|
+| `scripts/run_scraper_voyager.js` | ✅ Full history | **Recommended** |
+| `scripts/run_scraper_dom.js` | ⚠️ Current job only | DOM fallback |
+
+### Quick Start
+
+```bash
+# 1. Save a LinkedIn session (headless login)
+node scripts/login_cli.js
+
+# 2. Scrape profiles with full work history
+node scripts/run_scraper_voyager.js
+# Output → scrape_results_voyager.json
+```
+
+### MCP / Playwright Skill Usage
+
+```javascript
+// Paste scrapeLinkedInProfiles.js, then:
+const results = await scrapeLinkedInProfiles(page, {
+  company: 'Google',
+  country: 'United States',
+  industry: 'Software Development',
+  maxProfiles: 20
+});
+console.log(JSON.stringify(results, null, 2));
+```
 
 ### Configuration
 
@@ -135,28 +168,6 @@ Scrape LinkedIn profiles filtered by company, country, and/or industry.
 | `industry` | `''` | Target industry |
 | `keywords` | `''` | Additional search keywords |
 | `maxProfiles` | 20 | Maximum profiles to scrape |
-
-### Usage Examples
-
-```javascript
-// Single profile
-const profile = await scrapeSingleProfile(page, 'https://www.linkedin.com/in/username/');
-
-// Engineers at Google in the US
-const results = await scrapeLinkedInProfiles(page, {
-  company: 'Google',
-  country: 'United States',
-  industry: 'Software Development',
-  maxProfiles: 20
-});
-
-// Finance professionals in Singapore
-const results = await scrapeLinkedInProfiles(page, {
-  industry: 'Financial Services',
-  country: 'Singapore',
-  maxProfiles: 15
-});
-```
 
 For a detailed guide, see [PROFILE_SCRAPER.md](PROFILE_SCRAPER.md).
 

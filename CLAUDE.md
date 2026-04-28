@@ -50,9 +50,28 @@ Selectors are fragile — update if LinkedIn redesigns. See `skills/agents/web-s
 
 **Job apply:** `.job-card-container`, `button[aria-label*="Easy Apply"]`, `[role="dialog"]`, `button` containing "Submit application"
 
-**Profile scraper:** `h1` (name), `.text-body-small.inline.t-black--light.break-words` (location), `#experience` (section anchor), `li.artdeco-list__item` (experience items)
+**Profile scraper (aero architecture, 2024+):**
+- Name: first `h2` that isn't a UI label (LinkedIn aero uses `h2`, not `h1`)
+- Headline / location: `p` tags in document order after the name `h2`
+- **workHistory**: visit `/in/{vanityName}/details/experience/` and parse `document.body.innerText` — the main profile page does NOT render the Experience section in the DOM (aero lazy-loads it via RSC and it never lands in the HTML)
+- Old selectors (`#experience`, `li.artdeco-list__item`, `li.pvs-list__paged-list-item`, `t-bold`) are **deprecated** — LinkedIn aero uses hashed CSS class names
 
 **Contact reacher:** `button[aria-label*="Connect"]`, `button[aria-label*="More actions"]`, `textarea[name="message"]`
+
+## Profile Scraper Scripts
+
+| Script | Approach | workHistory |
+|--------|----------|-------------|
+| `scripts/run_scraper_voyager.js` | **Recommended** — visits `/details/experience/` subpage, parses `innerText` | ✅ Full history |
+| `scripts/run_scraper_dom.js` | Fallback — top-card DOM only | ⚠️ Current job only |
+| `scripts/run_scraper.js` | Legacy — DOM scraper with incremental scroll | ⚠️ Current job only |
+
+Run the recommended scraper:
+```bash
+node scripts/run_scraper_voyager.js
+```
+
+Session management: run `node scripts/login_cli.js` first to save `scripts/cookies.json`.
 
 ## Further Reading
 

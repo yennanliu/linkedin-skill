@@ -58,6 +58,8 @@ const results = await scrapeLinkedInProfiles(page, {
 console.log(JSON.stringify(results, null, 2));
 ```
 
+> **Note:** LinkedIn's aero architecture (2024+) does not render the Experience section in the main profile DOM. For full `workHistory`, use `scripts/run_scraper_voyager.js` which visits `/in/{vanityName}/details/experience/` per profile.
+
 ### Skill 3 — Contact Reacher
 
 ```javascript
