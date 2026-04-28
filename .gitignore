@@ -50,6 +50,9 @@ build/
 .env.local
 .env.*.local
 
+# Local credentials (never commit)
+scripts/config.json
+
 # Results and logs from automation runs
 *_result.txt
 results/

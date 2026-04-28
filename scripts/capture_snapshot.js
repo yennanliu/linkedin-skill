@@ -27,11 +27,24 @@ const path = require('path');
     console.log('📄 Page loaded. Current URL:', page.url());
     console.log('📑 Page Title:', await page.title());
 
-    // Scroll to ensure virtualized content is rendered
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
-    await page.waitForTimeout(2000);
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(2000);
+    // Scroll slowly to ensure all lazy-loaded content is triggered
+    console.log('📜 Scrolling to trigger lazy loading...');
+    for (let i = 0; i < 10; i++) {
+        await page.evaluate(() => window.scrollBy(0, 800));
+        await page.waitForTimeout(1500);
+    }
+    
+    // Attempt to find any section with 'Experience' heading and scroll it into view
+    await page.evaluate(() => {
+        const headings = Array.from(document.querySelectorAll('h2, h3, span'));
+        const expHeading = headings.find(h => h.textContent.trim().includes('Experience'));
+        if (expHeading) {
+            expHeading.scrollIntoView();
+        }
+    });
+    
+    await page.waitForTimeout(5000);
+    console.log('✅ Scrolling complete.');
 
     const html = await page.content();
     const filePath = path.join(process.cwd(), 'profile_snapshot.html');

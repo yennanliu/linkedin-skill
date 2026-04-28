@@ -1,5 +1,8 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
+const path = require('path');
+
+const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'));
 
 (async () => {
   const browser = await chromium.launch({ headless: true });
@@ -11,8 +14,8 @@ const fs = require('fs');
     await page.goto('https://www.linkedin.com/login', { waitUntil: 'networkidle' });
 
     console.log('👤 Entering credentials...');
-    await page.fill('#username', 'REDACTED_EMAIL');
-    await page.fill('#password', 'REDACTED');
+    await page.fill('#username', config.linkedin.email);
+    await page.fill('#password', config.linkedin.password);
     await page.click('button[type="submit"]');
 
     console.log('⏳ Waiting for navigation...');
