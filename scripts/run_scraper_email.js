@@ -68,14 +68,21 @@ const FREE_DOMAINS = new Set([
   'icloud.com', 'me.com', 'protonmail.com',
 ]);
 
+// Words that indicate a job title leaked in as the "company" — skip domain generation
+const TITLE_WORDS = /\b(cto|ceo|cfo|coo|vp|founder|director|manager|engineer|developer|analyst|consultant|researcher|scientist|architect|officer|president|intern|retired|freelance|self.?employed|independen|最高技術責任者|代表取締役)\b/i;
+
 function companyToDomain(companyName) {
   if (!companyName) return null;
+  // If the "company" looks like a job title, we can't infer a real domain
+  if (TITLE_WORDS.test(companyName)) return null;
 
-  return companyName
+  const domain = companyName
     .toLowerCase()
     .replace(/\b(inc|ltd|llc|corp|co|plc|gmbh|srl|bv|ag|sa|株式会社|有限会社)\b\.?/gi, '')
     .replace(/[^a-z0-9]+/g, '')
-    .trim() + '.com';
+    .trim();
+
+  return domain.length > 1 ? domain + '.com' : null;
 }
 
 // ── Scrape a single profile ──────────────────────────────────────────────────
@@ -100,7 +107,11 @@ async function scrapeProfile(page, profileUrl) {
         .filter(t => t.length > 2 && t !== name && !t.match(/^\d+(st|nd|rd|th)$/));
 
       title   = paras[0] || null;
-      country = paras.slice(1).find(t => /,/.test(t) && t.length < 60) || null;
+      // Country: a short line with a comma, not mentioning follower/connection counts
+      country = paras.slice(1).find(t =>
+        /,/.test(t) && t.length < 60 &&
+        !/follower|connection|mutual/i.test(t)
+      ) || null;
       company = paras[1] || null;
     }
 
@@ -124,17 +135,41 @@ async function scrapeProfile(page, profileUrl) {
     const DUR_RE  = /\d+\s+(?:yrs?|mos?)\b/i;
     const isDate  = s => DATE_RE.test(s) || DUR_RE.test(s);
 
+    const EMPLOY_TYPE_RE = /^\s*·?\s*(Permanent|Contract|Internship|Part[- ]time|Full[- ]time|Freelance|Self[- ]employed)\s*$/i;
+    const LOCATION_MODE_RE = /Hybrid|Remote|On-site|In-person/i;
+    const isNoise = s => isDate(s) || EMPLOY_TYPE_RE.test(s) || (LOCATION_MODE_RE.test(s) && s.length < 50);
+
     const expIdx = lines.findIndex(l => l === 'Experience');
+    const stopSections = /^(Education|Skills|Licenses|Recommendations|More profiles|People also viewed|Interests|Volunteering|Projects)/i;
     if (expIdx !== -1) {
-      for (let i = expIdx + 1; i < lines.length - 1; i++) {
-        if (isDate(lines[i + 1]) && !isDate(lines[i])) {
-          currentTitle = lines[i].replace(/\s*·\s*(Permanent|Contract|Internship|Part[- ]time|Full[- ]time|Freelance|Self[- ]employed).*/i, '').trim();
-          // Company is 1–3 lines before the title
-          for (let j = i - 1; j >= Math.max(0, i - 4); j--) {
-            if (!isDate(lines[j]) && lines[j].length > 1) {
-              currentCompany = lines[j].replace(/\s*·\s*.+$/, '').trim();
+      const expLines = [];
+      for (let i = expIdx + 1; i < lines.length; i++) {
+        if (stopSections.test(lines[i])) break;
+        expLines.push(lines[i]);
+      }
+      // First title = first non-noise line immediately followed by a date
+      for (let i = 0; i < expLines.length - 1; i++) {
+        if (isDate(expLines[i + 1]) && !isNoise(expLines[i])) {
+          const rawTitle = expLines[i].replace(/\s*·\s*(Permanent|Contract|Internship|Part[- ]time|Full[- ]time|Freelance|Self[- ]employed).*/i, '').trim();
+          // Company = closest non-noise line before title
+          let rawCompany = null;
+          for (let j = i - 1; j >= Math.max(0, i - 5); j--) {
+            if (!isNoise(expLines[j]) && expLines[j].length > 1) {
+              rawCompany = expLines[j].replace(/\s*·\s*.+$/, '').trim();
               break;
             }
+          }
+
+          // Swap detection: sometimes LinkedIn shows Title then Company (not Company then Title)
+          const looksLikeTitle   = s => /Engineer|Developer|Manager|Analyst|Consultant|Director|Designer|Specialist|Coordinator|Intern|Researcher|Scientist|Architect|Officer|President|Founder|CEO|CTO|CFO|COO|VP|Head|Lead|Principal/i.test(s);
+          const looksLikeCompany = s => /Inc\.|Ltd|LLC|Corp|Co\.|株式会社|有限会社|University|Institute|Technologies|Systems|Solutions|Group|Holdings|Partners|Labs|Studio/i.test(s);
+
+          if (rawCompany && looksLikeTitle(rawCompany) && !looksLikeTitle(rawTitle) && !looksLikeCompany(rawCompany)) {
+            currentTitle   = rawCompany;
+            currentCompany = rawTitle;
+          } else {
+            currentTitle   = rawTitle;
+            currentCompany = rawCompany;
           }
           break;
         }
