@@ -84,7 +84,6 @@ function inferDomain(companyName, domainMap = {}) {
     'zoom':      'zoom.us',
     'dropbox':   'dropbox.com',
     'spotify':   'spotify.com',
-    'twitter':   'twitter.com',
   };
   const lower = companyName.toLowerCase();
   for (const [key, domain] of Object.entries(wellKnown)) {
@@ -282,6 +281,8 @@ async function extractSingleContact(page, profileUrl, options = {}) {
       return { name, headline, location, publicEmail, websites, currentCompany, currentTitle, workHistory, profileUrl: window.location.href };
     });
 
+    if (!data) return { status: 'error', reason: 'Page evaluate returned null', profileUrl };
+
     // ── Domain resolution ─────────────────────────────────────────────────
     const { firstName, lastName } = parseName(data.name);
     let domain = inferDomain(data.currentCompany, companyDomains);
@@ -364,6 +365,11 @@ async function extractSingleContact(page, profileUrl, options = {}) {
 
 // ── Batch enrich a list of contacts ─────────────────────────────────────
 async function extractContactInfo(page, contacts, options = {}) {
+  if (!Array.isArray(contacts) || contacts.length === 0) {
+    console.log('[Extract] No contacts to enrich.');
+    return [];
+  }
+
   const { delayMin = 2500, delayMax = 5000 } = options;
   const delay = () => page.waitForTimeout(delayMin + Math.random() * (delayMax - delayMin));
 

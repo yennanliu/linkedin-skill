@@ -165,6 +165,11 @@ async function reachSingleContact(page, contact, options = {}) {
 
 // ── Batch reach contacts ──────────────────────────────────────────────────
 async function reachContacts(page, contacts, options = {}) {
+  if (!Array.isArray(contacts) || contacts.length === 0) {
+    console.log('[Reach] No contacts to process.');
+    return { results: [], stats: { sent: 0, skipped: 0, failed: 0, alreadyConnected: 0 } };
+  }
+
   const {
     maxPerSession = 15,     // stay well under LinkedIn's weekly limit
     onlyUnreached = true,

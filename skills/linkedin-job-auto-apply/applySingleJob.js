@@ -31,6 +31,7 @@
  * @param {number} [userProfile.yearsExp]    - Years of experience to fill in numeric fields
  */
 async function fillFormDefaults(page, userProfile = {}) {
+  userProfile = userProfile || {};
   const profile = {
     phone: userProfile.phone || '0000000000',
     linkedinUrl: userProfile.linkedinUrl || 'https://www.linkedin.com/in/me',

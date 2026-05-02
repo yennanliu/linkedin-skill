@@ -18,6 +18,11 @@
  */
 
 async function saveOutput(contacts, options = {}) {
+  if (!contacts || !Array.isArray(contacts)) {
+    console.error('[Save] contacts must be an array. Received:', typeof contacts);
+    return null;
+  }
+
   const {
     format    = 'both',       // 'json' | 'csv' | 'both'
     outputDir = './output',   // relative to CWD when running in Node

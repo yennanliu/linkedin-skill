@@ -21,7 +21,7 @@
 async function discoverContacts(page, options = {}) {
   const {
     seeds = [],                  // [{ type: 'search', company, role, keywords } | { type: 'profile', url }]
-    strategy = 'bfs',            // 'bfs' (queue) | 'dfs' (stack)
+    strategy: rawStrategy = 'bfs',  // 'bfs' (queue) | 'dfs' (stack)
     maxContacts = 30,            // max unique contacts to discover
     maxDepth = 2,                // max BFS/DFS levels from seed
     targetCompanies = [],        // filter: only include these companies (empty = all)
@@ -30,6 +30,21 @@ async function discoverContacts(page, options = {}) {
     delayMax = 6000,
     connectionDegree = ['1st', '2nd', '3rd'],  // which connection degrees to include
   } = options;
+
+  const strategy = ['bfs', 'dfs'].includes(rawStrategy) ? rawStrategy : 'bfs';
+  if (strategy !== rawStrategy) {
+    console.warn(`[Discover] Unknown strategy "${rawStrategy}", defaulting to "bfs".`);
+  }
+
+  if (!Array.isArray(seeds)) {
+    console.warn('[Discover] seeds must be an array. Received:', typeof seeds);
+    return [];
+  }
+
+  if (maxContacts <= 0) {
+    console.log('[Discover] maxContacts is 0 or negative — returning empty list.');
+    return [];
+  }
 
   const delay = () =>
     page.waitForTimeout(delayMin + Math.random() * (delayMax - delayMin));
