@@ -133,32 +133,79 @@ When `guessPersonalEmail: true`, these patterns are generated:
 
 ---
 
-## Email Verification Workflow
+## Online Domain Discovery
 
-After generating candidates, verify before using:
+When `inferDomain()` can't resolve the company email domain from the built-in table, `lookupDomainOnline(page, companyName)` searches three sources in order:
 
-### Free verification approaches
+| Source | URL pattern | Notes |
+|--------|-------------|-------|
+| **emailformat.com** | `https://www.emailformat.com/{slug}/` | Public directory of corporate email patterns |
+| **Hunter.io** | `https://hunter.io/companies/{slug}` | Shows dominant pattern for many companies |
+| **Google search** | `"{company}" email format site:hunter.io OR site:emailformat.com` | Fallback, parses first `@domain.com` match |
+
+Returns `{ domain, pattern }` or `null`. The discovered domain is used to generate candidates, and `domainSource` in the output reflects how the domain was found (`'user-provided'`, `'built-in'`, or `'online-lookup'`).
+
+Enable with `onlineLookup: true`:
+```javascript
+await extractContactInfo(page, contacts, {
+  companyDomains: { 'Google': 'google.com' },
+  onlineLookup: true,    // discover unknown domains from the web
+  validateEmails: true,  // validate top 3 candidates via mailcheck.ai
+});
+```
+
+---
+
+## Email Validation
+
+`validateEmailCandidates(page, candidates, { maxValidate: 3 })` checks the top N candidates via **mailcheck.ai** (free, no API key required).
+
+Each result:
+```json
+{
+  "email": "jane.smith@stripe.com",
+  "valid": true,
+  "mx": true,
+  "disposable": false,
+  "status": "valid"
+}
+```
+
+Remaining candidates beyond `maxValidate` get `{ valid: null, status: "not_checked" }`.
+
+The full validated list is returned as `emailCandidatesValidated` on each contact.
+
+### Output example
+
+```javascript
+{
+  name: "Jane Smith",
+  companyDomain: "stripe.com",
+  domainSource: "online-lookup",          // 'user-provided' | 'built-in' | 'online-lookup'
+  onlineEmailPattern: "jane@stripe.com",  // pattern discovered from emailformat.com/hunter.io
+  emailCandidates: ["jane.smith@stripe.com", "jsmith@stripe.com", ...],
+  emailCandidatesValidated: [
+    { email: "jane.smith@stripe.com", valid: true,  mx: true, status: "valid" },
+    { email: "jsmith@stripe.com",     valid: false, mx: true, status: "invalid" },
+    { email: "janesmith@stripe.com",  valid: false, mx: true, status: "invalid" },
+    { email: "janes@stripe.com",      valid: null,  mx: null, status: "not_checked" },
+    ...
+  ]
+}
+```
+
+### Free verification approaches (manual)
 
 1. **LinkedIn profile** — some users list email in contact info (visible to connections)
 2. **GitHub profile** — public contributions often show email in commit history
 3. **Twitter/X bio** — some professionals list email
 4. **Personal website** — found via LinkedIn "websites" field
 
-### Programmatic verification (beyond this skill)
+### Third-party APIs (if you need bulk validation)
 
 - **Hunter.io API** — `GET /v2/email-finder?domain=google.com&first_name=Jane&last_name=Smith`
 - **NeverBounce / ZeroBounce** — batch email validation APIs
 - **SMTP verification** — check MX record + RCPT TO (unreliable for large companies)
-
-### Confidence scoring (add to output)
-
-```javascript
-function scoreEmailCandidate(email, patternIndex) {
-  // First 2 patterns are most probable
-  const baseScore = patternIndex === 0 ? 0.85 : patternIndex === 1 ? 0.70 : 0.40;
-  return { email, confidence: baseScore };
-}
-```
 
 ---
 

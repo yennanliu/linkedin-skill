@@ -9,6 +9,8 @@
  * const enriched = await extractContactInfo(page, contacts, {
  *   companyDomains: { 'Google': 'google.com', 'Meta': 'meta.com' },
  *   guessPersonalEmail: true,
+ *   onlineLookup: true,    // search Hunter.io / emailformat.com / Google for domain
+ *   validateEmails: true,  // validate top candidates via mailcheck.ai (free)
  * });
  * ```
  */
@@ -98,9 +100,116 @@ function inferDomain(companyName, domainMap = {}) {
   return slug ? `${slug}.com` : null;
 }
 
+// ── Online domain discovery ───────────────────────────────────────────────
+// Tries emailformat.com → Hunter.io → Google to find the real email domain/pattern.
+// Returns { domain, pattern } or null if nothing found.
+async function lookupDomainOnline(page, companyName) {
+  const slug = companyName
+    .toLowerCase()
+    .replace(/\b(inc|llc|ltd|corp|co|company|technologies|technology|group|solutions|services|platforms)\b/g, '')
+    .replace(/[^a-z0-9]+/g, '')
+    .trim();
+
+  if (!slug) return null;
+
+  // 1. emailformat.com — simple public directory of corporate email patterns
+  try {
+    await page.goto(`https://www.emailformat.com/${slug}/`, { waitUntil: 'domcontentloaded', timeout: 12000 });
+    await page.waitForTimeout(1000);
+    const result = await page.evaluate(() => {
+      const text = document.body.innerText;
+      // Page shows lines like "john@company.com  100%"
+      const domainMatch = text.match(/@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+      const patternMatch = text.match(/([a-z{}.]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+      return {
+        domain:  domainMatch  ? domainMatch[1].toLowerCase()  : null,
+        pattern: patternMatch ? patternMatch[1].toLowerCase() : null,
+      };
+    });
+    if (result.domain && !result.domain.includes('emailformat.com')) return result;
+  } catch (_) {}
+
+  // 2. Hunter.io public company page
+  try {
+    await page.goto(`https://hunter.io/companies/${slug}`, { waitUntil: 'domcontentloaded', timeout: 12000 });
+    await page.waitForTimeout(1200);
+    const result = await page.evaluate(() => {
+      const text = document.body.innerText;
+      const domainMatch  = text.match(/@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+      const patternMatch = text.match(/([a-z{}.]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+      return {
+        domain:  domainMatch  ? domainMatch[1].toLowerCase()  : null,
+        pattern: patternMatch ? patternMatch[1].toLowerCase() : null,
+      };
+    });
+    if (result.domain && !result.domain.includes('hunter.io')) return result;
+  } catch (_) {}
+
+  // 3. Google search fallback — extract first @domain.com mention from results
+  try {
+    const q = encodeURIComponent(`"${companyName}" employee email format site:hunter.io OR site:emailformat.com OR site:rocketreach.co`);
+    await page.goto(`https://www.google.com/search?q=${q}`, { waitUntil: 'domcontentloaded', timeout: 12000 });
+    await page.waitForTimeout(1200);
+    const result = await page.evaluate((name) => {
+      const text = document.body.innerText;
+      // Avoid matching google.com itself
+      const matches = [...text.matchAll(/@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g)]
+        .map(m => m[1].toLowerCase())
+        .filter(d => !d.includes('google') && !d.includes('gstatic') && !d.includes('schema'));
+      return matches.length > 0 ? { domain: matches[0], pattern: null } : null;
+    }, companyName);
+    if (result) return result;
+  } catch (_) {}
+
+  return null;
+}
+
+// ── Email validation via mailcheck.ai (free, no key required) ────────────
+// Validates top N candidates. Returns array of { email, valid, mx, status }.
+async function validateEmailCandidates(page, candidates, { maxValidate = 3 } = {}) {
+  const validated = [];
+
+  for (let i = 0; i < candidates.length; i++) {
+    const email = candidates[i];
+    if (i < maxValidate) {
+      try {
+        await page.goto(
+          `https://api.mailcheck.ai/email/${encodeURIComponent(email)}`,
+          { waitUntil: 'domcontentloaded', timeout: 10000 }
+        );
+        await page.waitForTimeout(400);
+        const json = await page.evaluate(() => {
+          try { return JSON.parse(document.body.innerText); } catch { return null; }
+        });
+        validated.push({
+          email,
+          valid:      json?.status === 'valid',
+          mx:         json?.mx       ?? null,
+          disposable: json?.disposable ?? false,
+          status:     json?.status    ?? 'unknown',
+        });
+      } catch (_) {
+        validated.push({ email, valid: null, mx: null, status: 'error' });
+      }
+      await page.waitForTimeout(300);
+    } else {
+      validated.push({ email, valid: null, mx: null, status: 'not_checked' });
+    }
+  }
+
+  return validated;
+}
+
 // ── Visit a single profile and extract all available data ────────────────
 async function extractSingleContact(page, profileUrl, options = {}) {
-  const { companyDomains = {}, guessPersonalEmail = false, delayMin = 2000, delayMax = 4000 } = options;
+  const {
+    companyDomains  = {},
+    guessPersonalEmail = false,
+    onlineLookup    = false,
+    validateEmails  = false,
+    delayMin = 2000,
+    delayMax = 4000,
+  } = options;
 
   try {
     await page.goto(profileUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
@@ -173,14 +282,35 @@ async function extractSingleContact(page, profileUrl, options = {}) {
       return { name, headline, location, publicEmail, websites, currentCompany, currentTitle, workHistory, profileUrl: window.location.href };
     });
 
-    // ── Generate email candidates ──────────────────────────────────────────
+    // ── Domain resolution ─────────────────────────────────────────────────
     const { firstName, lastName } = parseName(data.name);
-    const domain = inferDomain(data.currentCompany, companyDomains);
-    const emailCandidates = domain && firstName && lastName
+    let domain = inferDomain(data.currentCompany, companyDomains);
+    let onlinePattern = null;
+
+    // If built-in lookup failed and online lookup is enabled, search external sites
+    if (!domain && onlineLookup && data.currentCompany) {
+      console.log(`  [Domain] Built-in lookup failed — searching online for "${data.currentCompany}"...`);
+      try {
+        const found = await lookupDomainOnline(page, data.currentCompany);
+        if (found) {
+          domain = found.domain;
+          onlinePattern = found.pattern;
+          console.log(`  [Domain] Found online: ${domain}${onlinePattern ? ` (pattern: ${onlinePattern})` : ''}`);
+        }
+      } catch (_) {}
+      // Restore to LinkedIn profile after external navigation
+      try {
+        await page.goto(profileUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await page.waitForTimeout(800);
+      } catch (_) {}
+    }
+
+    // ── Generate email candidates ──────────────────────────────────────────
+    let emailCandidates = domain && firstName && lastName
       ? generateEmailCandidates(firstName, lastName, domain)
       : [];
 
-    // ── Personal email guesses (GitHub-style personal domains, Gmail patterns) ─
+    // ── Personal email guesses ────────────────────────────────────────────
     const personalEmailCandidates = [];
     if (guessPersonalEmail && firstName && lastName) {
       const f = firstName.toLowerCase().replace(/[^a-z]/g, '');
@@ -193,18 +323,21 @@ async function extractSingleContact(page, profileUrl, options = {}) {
       );
     }
 
-    // If a public email was found directly on the profile, put it first
+    // If a public email was found on the profile, put it first
     if (data.publicEmail) {
-      const allEmails = [data.publicEmail, ...emailCandidates.filter(e => e !== data.publicEmail)];
-      return {
-        status: 'success',
-        ...data,
-        firstName,
-        lastName,
-        companyDomain: domain,
-        emailCandidates: allEmails,
-        personalEmailCandidates,
-      };
+      emailCandidates = [data.publicEmail, ...emailCandidates.filter(e => e !== data.publicEmail)];
+    }
+
+    // ── Email validation ───────────────────────────────────────────────────
+    let emailCandidatesValidated = null;
+    if (validateEmails && emailCandidates.length > 0) {
+      console.log(`  [Validate] Checking top email candidates via mailcheck.ai...`);
+      try {
+        emailCandidatesValidated = await validateEmailCandidates(page, emailCandidates, { maxValidate: 3 });
+        // Restore page after validation requests
+        await page.goto(profileUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await page.waitForTimeout(800);
+      } catch (_) {}
     }
 
     return {
@@ -213,7 +346,14 @@ async function extractSingleContact(page, profileUrl, options = {}) {
       firstName,
       lastName,
       companyDomain: domain,
+      domainSource: domain
+        ? (Object.keys(companyDomains).some(k => (data.currentCompany || '').toLowerCase().includes(k.toLowerCase()))
+            ? 'user-provided'
+            : onlinePattern ? 'online-lookup' : 'built-in')
+        : null,
+      onlineEmailPattern: onlinePattern,
       emailCandidates,
+      emailCandidatesValidated,
       personalEmailCandidates,
     };
 
@@ -241,7 +381,9 @@ async function extractContactInfo(page, contacts, options = {}) {
     enriched.push({ ...contact, ...info });
 
     if (info.status === 'success') {
-      console.log(`  ✅ ${info.name} @ ${info.currentCompany || '—'} | domain: ${info.companyDomain || '—'} | ${info.emailCandidates.length} email candidates`);
+      const validCount = (info.emailCandidatesValidated || []).filter(e => e.valid).length;
+      const validNote  = info.emailCandidatesValidated ? ` | ${validCount} valid` : '';
+      console.log(`  ✅ ${info.name} @ ${info.currentCompany || '—'} | domain: ${info.companyDomain || '—'} (${info.domainSource || '?'}) | ${info.emailCandidates.length} candidates${validNote}`);
     } else {
       console.log(`  ❌ Failed: ${info.reason}`);
     }
@@ -254,5 +396,9 @@ async function extractContactInfo(page, contacts, options = {}) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { extractContactInfo, extractSingleContact, generateEmailCandidates, inferDomain, parseName };
+  module.exports = {
+    extractContactInfo, extractSingleContact,
+    generateEmailCandidates, inferDomain, parseName,
+    lookupDomainOnline, validateEmailCandidates,
+  };
 }
